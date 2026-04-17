@@ -5,15 +5,9 @@ import {
   MessageSquare, 
   User, 
   ShieldCheck, 
-  Plane, 
   Video, 
-  Fingerprint, 
   ChevronLeft,
   Lock,
-  Zap,
-  PhoneCall,
-  Calendar,
-  CreditCard,
   Briefcase,
   Bell,
   CheckCircle2,
@@ -23,22 +17,14 @@ import {
   MoreVertical,
   Camera,
   ImageIcon,
-  Star,
-  Award,
-  LogOut,
   MapPin,
-  Settings,
   X,
   Mic,
   VideoOff,
   PhoneOff,
-  Clock,
-  BellOff,
   ShieldAlert,
   Share2,
   Shuffle,
-  UserPlus,
-  ArrowRight,
   Ban
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -102,8 +88,6 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('splash');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [tripStatus, setTripStatus] = useState<TripStatus>('none');
-  const [isSOSActive, setIsSOSActive] = useState(false);
-  const [showFundsAnimation, setShowFundsAnimation] = useState(false);
   
   // Navigation State
   const [activeUser, setActiveUser] = useState<UserData | null>(null);
@@ -113,7 +97,6 @@ export default function App() {
   const [showVouchModal, setShowVouchModal] = useState(false);
   const [showNetworkingForm, setShowNetworkingForm] = useState(false);
   const [showChatOptions, setShowChatOptions] = useState(false);
-  const [activeOpportunity, setActiveOpportunity] = useState<{title: string, sector: string} | null>(null);
   
   const [message, setMessage] = useState('');
   const [chatMessages, setChatMessages] = useState<Record<string, {sender: Role, text: string}[]>>({});
@@ -1074,15 +1057,6 @@ export default function App() {
         </div>
       )}
 
-      {showFundsAnimation && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-black/95 z-[200] flex flex-col justify-center items-center text-center px-12">
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring' }} className="w-40 h-40 bg-safe/20 rounded-[44px] flex justify-center items-center mb-10 border border-safe/40 shadow-[0_0_80px_rgba(46,204,113,0.3)]">
-             <CheckCircle2 size={90} className="text-safe" />
-          </motion.div>
-          <h2 className="text-4xl font-black text-white mb-4 tracking-tighter">Éxito</h2>
-          <p className="text-sm text-zinc-500 leading-relaxed font-bold italic">Depósito de $2,500 liberado.</p>
-        </motion.div>
-      )}
     </FullscreenContainer>
   );
 }
