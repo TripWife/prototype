@@ -175,6 +175,56 @@ export default function App() {
           </div>
         );
 
+      case 'onboarding':
+        return (
+          <div className="h-full flex flex-col pt-10 px-8 bg-[#050607] overflow-y-auto pb-20 fade-in">
+            <button onClick={() => setScreen('splash')} className="absolute top-6 left-6 w-10 h-10 glass rounded-full flex items-center justify-center text-zinc-400 z-10"><ChevronLeft size={20} /></button>
+            <div className="text-center mb-10 pt-4">
+              <span className="text-[9px] font-black tracking-[4px] uppercase text-primary mb-2 block object-left">Paso 1 de 2</span>
+              <h2 className="text-4xl font-black italic tracking-tighter text-white leading-none">
+                {role === 'male' ? 'Validación Ejecutiva' : 'Perfil de Viajera'}
+              </h2>
+              <p className="text-zinc-500 text-[10px] mt-4 font-bold tracking-widest uppercase">
+                {role === 'male' ? 'Requiere Verificación Institucional (KYC)' : 'Comunidad 100% verificada'}
+              </p>
+            </div>
+            
+            <div className="space-y-4 mb-10">
+              <div className="glass-card bg-black/40 border-white/5 rounded-2xl p-2 flex items-center">
+                 <input type="text" placeholder="Alias o Nombre Real" className="w-full bg-transparent border-none text-white px-4 py-3 placeholder:text-zinc-600 outline-none text-sm font-medium" />
+              </div>
+
+              {role === 'female' && (
+                <>
+                  <div className="glass-card bg-black/40 border-white/5 rounded-2xl p-2 flex items-center">
+                    <input type="text" placeholder="Ciudad actual (Ej. Miami, FL)" className="w-full bg-transparent border-none text-white px-4 py-3 placeholder:text-zinc-600 outline-none text-sm font-medium" />
+                  </div>
+                  <div className="glass-card bg-black/40 border-white/5 rounded-2xl p-2 flex items-center">
+                    <input type="date" className="w-full bg-transparent border-none text-white px-4 py-3 placeholder:text-zinc-600 outline-none text-sm font-medium opacity-50" />
+                  </div>
+                </>
+              )}
+
+              {role === 'male' && (
+                <div className="glass-card p-6 bg-zinc-950 border border-primary/20 rounded-[32px] mt-8 text-center shadow-xl">
+                    <ShieldCheck size={32} className="text-primary mx-auto mb-4" />
+                    <h3 className="text-sm font-black text-white uppercase tracking-widest mb-2">Escaneo Financiero</h3>
+                    <p className="text-[10px] text-zinc-500 leading-relaxed font-bold">En un entorno de producción, esto conectaría con Stripe Identity u Onfido para validación de fondos y antecedentes criminales instantáneos.</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="mt-auto">
+               <button onClick={() => {
+                   toast(role === 'male' ? "VALIDACIÓN APROBADA" : "PERFIL CREADO", "gold");
+                   setScreen(role === 'male' ? 'paywall' : 'hub');
+               }} className="btn-gold w-full flex items-center justify-center py-5 uppercase tracking-[3px] font-black text-sm shadow-primary/30 active:scale-95 transition-all">
+                  Completar Registro
+               </button>
+            </div>
+          </div>
+        );
+
       case 'paywall':
         return (
           <div className="h-full px-8 pt-10 overflow-y-auto pb-20 fade-in bg-black">
