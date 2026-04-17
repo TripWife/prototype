@@ -614,8 +614,8 @@ export default function App() {
                      <div className="flex items-center gap-4 text-left">
                         <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary border border-primary/20 shadow-inner"><CreditCard size={24} /></div>
                         <div className="text-left">
-                           <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-[3px] text-left">Capital Protegido</p>
-                           <p className="text-xl font-black text-white italic text-left">{role === 'male' ? '$12,500' : '$2,000'}</p>
+                            <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-[3px] text-left">{role === 'male' ? 'Capital Protegido' : 'Fondo de Garantía'}</p>
+                            <p className="text-xl font-black text-white italic text-left">$2,500</p>
                         </div>
                      </div>
                      <ChevronLeft size={20} className="text-primary rotate-180 opacity-60" />
@@ -637,9 +637,9 @@ export default function App() {
             
             <div className="flex-1 px-8 overflow-y-auto pb-10 scrollbar-hide text-center pt-8">
               <div className="text-center mb-14">
-                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">Balance Disponible en Escrow</p>
-                 <h2 className="text-6xl font-black italic tracking-tighter text-white mb-4">{role === 'male' ? '$12,500' : '$2,000'}</h2>
-                 <p className="text-[9px] text-primary font-bold uppercase tracking-[4px] mt-2 inline-flex items-center gap-2 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20"><Lock size={12} /> Alta Seguridad Institucional</p>
+                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">{role === 'male' ? 'Fondos en Custodia Activa' : 'Fondo de Seguridad'}</p>
+                 <h2 className="text-6xl font-black italic tracking-tighter text-white mb-4">$2,500</h2>
+                 <p className="text-[9px] text-primary font-bold uppercase tracking-[4px] mt-2 inline-flex items-center gap-2 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20"><Lock size={12} /> {role === 'male' ? '1 Itinerario Activo' : 'Garantía de Viaje Activa'}</p>
               </div>
 
               <div className="flex gap-4 mb-14">
