@@ -609,18 +609,58 @@ export default function App() {
                      </div>
                   </div>
                   
-                  <h3 className="text-[10px] font-black text-zinc-600 uppercase tracking-widest pl-2 mt-10 text-left">Finanzas y Escrow</h3>
-                  <div onClick={() => setScreen('wallet')} className="glass-card bg-[#0a0b0d] p-5 rounded-[28px] border border-primary/20 flex flex-row items-center justify-between cursor-pointer active:scale-95 transition-all shadow-[0_0_20px_rgba(197,168,128,0.05)] text-left mb-4">
-                     <div className="flex items-center gap-4 text-left">
-                        <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary border border-primary/20 shadow-inner"><CreditCard size={24} /></div>
-                        <div className="text-left">
-                            <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-[3px] text-left">{role === 'male' ? 'Capital Protegido' : 'Fondo de Garantía'}</p>
-                            <p className="text-xl font-black text-white italic text-left">$2,500</p>
-                        </div>
-                     </div>
-                     <ChevronLeft size={20} className="text-primary rotate-180 opacity-60" />
-                  </div>
-               </div>
+                   {role === 'male' && (
+                      <>
+                         <h3 className="text-[10px] font-black text-zinc-600 uppercase tracking-widest pl-2 mt-10 text-left">Finanzas y Escrow</h3>
+                         <div onClick={() => setScreen('wallet')} className="glass-card bg-[#0a0b0d] p-5 rounded-[28px] border border-primary/20 flex flex-row items-center justify-between cursor-pointer active:scale-95 transition-all shadow-[0_0_20px_rgba(197,168,128,0.05)] text-left mb-4">
+                            <div className="flex items-center gap-4 text-left">
+                               <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary border border-primary/20 shadow-inner"><CreditCard size={24} /></div>
+                               <div className="text-left">
+                                   <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-[3px] text-left">Capital Protegido</p>
+                                   <p className="text-xl font-black text-white italic text-left">$2,500</p>
+                               </div>
+                            </div>
+                            <ChevronLeft size={20} className="text-primary rotate-180 opacity-60" />
+                         </div>
+                      </>
+                   )}
+
+                   {role === 'female' && (
+                      <>
+                         <h3 className="text-[10px] font-black text-zinc-600 uppercase tracking-widest pl-2 mt-10 text-left">Sobre Mí</h3>
+                         <div className="glass-card bg-[#0a0b0d] p-6 rounded-[32px] border border-white/5 text-left mb-6 relative">
+                            <button className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-zinc-500 active:scale-95"><MoreVertical size={14}/></button>
+                            <p className="text-zinc-400 text-sm leading-relaxed font-medium mt-1">Buscando un caballero para compartir un verano eterno en las Cícladas. Amante del arte, la buena mesa y las conversaciones que duran hasta el amanecer.</p>
+                            <div className="flex gap-2 mt-5 flex-wrap">
+                               <span className="text-[9px] font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-xl border border-primary/20">FOTOGRAFÍA</span>
+                               <span className="text-[9px] font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-xl border border-primary/20">GASTRONOMÍA</span>
+                               <span className="text-[9px] font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-xl border border-primary/20">YATES</span>
+                            </div>
+                         </div>
+
+                         <div className="flex justify-between items-center mt-10 mb-4 pl-2">
+                            <h3 className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Mi Galería Privada</h3>
+                            <button className="text-[10px] font-bold text-primary uppercase tracking-widest flex items-center gap-1 active:scale-95"><Plus size={14} strokeWidth={3}/> Subir</button>
+                         </div>
+                         <div className="grid grid-cols-2 gap-3 mb-8">
+                            <div className="aspect-square rounded-3xl bg-zinc-900 border border-white/5 flex items-center justify-center overflow-hidden relative group">
+                               <img src="/assets/isabella.png" className="w-full h-full object-cover opacity-80" />
+                               <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Camera size={24} className="text-white"/></div>
+                            </div>
+                            <div className="aspect-square rounded-3xl bg-zinc-900 border border-white/5 flex flex-col items-center justify-center text-zinc-600 gap-2 cursor-pointer active:scale-95 hover:bg-zinc-800 transition-colors">
+                               <Camera size={24} />
+                               <span className="text-[9px] font-bold uppercase tracking-widest">Añadir Foto</span>
+                            </div>
+                         </div>
+                         
+                         <div className="p-5 rounded-[28px] border border-safe/20 bg-safe/5 flex flex-col items-center justify-center mb-4 mt-8 text-center cursor-pointer shadow-[0_0_15px_rgba(74,222,128,0.05)]">
+                            <div className="w-10 h-10 rounded-full bg-safe/20 flex items-center justify-center text-safe mb-2"><ShieldCheck size={20} /></div>
+                            <p className="text-[10px] font-bold text-safe uppercase tracking-[3px]">Protección Activa</p>
+                            <p className="text-[9px] text-zinc-500 font-medium mt-1">Protocolo SOS TripWife habilitado</p>
+                         </div>
+                      </>
+                   )}
+                </div>
             </div>
             <Navbar active="profile" role={role} onNav={(s) => setScreen(s)} />
           </div>
