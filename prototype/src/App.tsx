@@ -6,8 +6,12 @@ import {
   User, 
   ShieldCheck, 
   Video, 
+  Fingerprint, 
   ChevronLeft,
   Lock,
+  Zap,
+  Calendar,
+  CreditCard,
   Briefcase,
   Bell,
   CheckCircle2,
@@ -17,14 +21,19 @@ import {
   MoreVertical,
   Camera,
   ImageIcon,
+  Award,
+  LogOut,
   MapPin,
   X,
   Mic,
   VideoOff,
   PhoneOff,
+  Clock,
+  BellOff,
   ShieldAlert,
   Share2,
   Shuffle,
+  UserPlus,
   Ban
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -97,6 +106,7 @@ export default function App() {
   const [showVouchModal, setShowVouchModal] = useState(false);
   const [showNetworkingForm, setShowNetworkingForm] = useState(false);
   const [showChatOptions, setShowChatOptions] = useState(false);
+  const [activeOpportunity, setActiveOpportunity] = useState<{title: string, sector: string} | null>(null);
   
   const [message, setMessage] = useState('');
   const [chatMessages, setChatMessages] = useState<Record<string, {sender: Role, text: string}[]>>({});
