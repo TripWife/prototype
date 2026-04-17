@@ -75,20 +75,9 @@ const GENTLEMEN: UserData[] = [
 
 // --- Components ---
 
-const PhoneFrame = ({ children, role, onRoleSwitch }: { children: React.ReactNode, role: Role, onRoleSwitch: (r: Role) => void }) => (
-  <div className="relative w-full h-screen bg-background flex justify-center items-center overflow-hidden">
-    <div className="hidden lg:flex fixed top-8 right-8 z-[200] bg-black/80 border border-primary/20 p-4 rounded-2xl backdrop-blur-xl flex-col gap-3">
-      <p className="text-[10px] text-primary uppercase font-bold tracking-widest text-center">Demo Controls</p>
-      <button onClick={() => onRoleSwitch('male')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${role === 'male' ? 'bg-primary text-black' : 'border border-primary/20 text-primary'}`}>SIMULAR CABALLERO</button>
-      <button onClick={() => onRoleSwitch('female')} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${role === 'female' ? 'bg-primary text-black' : 'border border-primary/20 text-primary'}`}>SIMULAR VIAJERA</button>
-    </div>
-
-    <div className="relative w-[390px] h-[844px] bg-black rounded-[55px] shadow-[0_0_100px_rgba(0,0,0,0.8)] border-[12px] border-[#121212] flex flex-col overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[140px] h-[30px] bg-[#121212] rounded-b-[20px] z-[1000]" />
-      <div className="flex-1 relative overflow-hidden flex flex-col pt-10">
-        {children}
-      </div>
-    </div>
+const FullscreenContainer = ({ children }: { children: React.ReactNode }) => (
+  <div className="fixed inset-0 bg-black flex flex-col overflow-hidden select-none touch-none">
+    {children}
   </div>
 );
 
@@ -171,12 +160,21 @@ export default function App() {
     switch(screen) {
       case 'splash':
         return (
-          <div className="h-full flex flex-col justify-center items-center text-center px-10 fade-in">
-            <h1 className="text-5xl font-extrabold bg-gold-gradient bg-clip-text text-transparent mb-2">TripWife</h1>
-            <p className="text-[10px] tracking-[6px] text-zinc-500 font-bold uppercase mb-20 font-display">Elite Private Network</p>
-            <div className="w-full flex flex-col gap-4">
-              <button onClick={() => setRole('male')} className="btn-gold w-full text-sm font-black tracking-widest">Entrar como CABALLERO</button>
-              <button onClick={() => setRole('female')} className="btn-outline w-full text-zinc-400 font-bold">Entrar como VIAJERA</button>
+          <div className="h-full flex flex-col items-center justify-center bg-black px-12 text-center fade-in">
+            <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mb-12">
+               <div className="w-24 h-24 bg-primary rounded-[32px] flex items-center justify-center shadow-[0_0_60px_rgba(197,168,128,0.4)] mx-auto"><Gem size={48} className="text-black" /></div>
+            </motion.div>
+            <h1 className="text-6xl font-black italic tracking-tighter text-white mb-2 leading-none">TripWife</h1>
+            <p className="text-[10px] text-primary font-black uppercase tracking-[8px] mb-20 opacity-80">Elite Journey</p>
+            
+            <div className="w-full space-y-4 pt-12">
+               <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest mb-6">Selecciona tu perfil de acceso</p>
+               <button onClick={() => { setRole('male'); setScreen('onboarding'); }} className="w-full py-5 rounded-[24px] bg-white text-black text-[10px] font-black uppercase tracking-[4px] shadow-xl active:scale-95 transition-all">
+                  Soy un Caballero
+               </button>
+               <button onClick={() => { setRole('female'); setScreen('onboarding'); }} className="w-full py-5 rounded-[24px] glass border-white/20 text-white text-[10px] font-black uppercase tracking-[4px] active:scale-95 transition-all">
+                  Soy una Viajera
+               </button>
             </div>
           </div>
         );
@@ -919,7 +917,7 @@ export default function App() {
   }
 
   return (
-    <PhoneFrame role={role} onRoleSwitch={(r) => {setRole(r); setChatMessages({}); setScreen('hub'); setIsSubscribed(false); setTripStatus('none'); setActiveUser(null); setChatMode('list'); }}>
+    <FullscreenContainer>
       <AnimatePresence mode="wait">
         <motion.div key={screen + role + (activeUser?.id || '') + chatMode} initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.02 }} transition={{ duration: 0.3 }} className="h-full relative z-0">
           {renderScreen()}
@@ -1085,7 +1083,7 @@ export default function App() {
           <p className="text-sm text-zinc-500 leading-relaxed font-bold italic">Depósito de $2,500 liberado.</p>
         </motion.div>
       )}
-    </PhoneFrame>
+    </FullscreenContainer>
   );
 }
 
