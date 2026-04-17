@@ -40,7 +40,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 // --- Types ---
 type Role = 'none' | 'male' | 'female';
-type Screen = 'splash' | 'onboarding' | 'paywall' | 'hub' | 'chat' | 'legal' | 'trips' | 'business' | 'profile' | 'business-protocol' | 'video-discovery';
+type Screen = 'splash' | 'onboarding' | 'paywall' | 'hub' | 'chat' | 'legal' | 'trips' | 'business' | 'profile' | 'business-protocol' | 'video-discovery' | 'wallet';
 type TripStatus = 'none' | 'proposed' | 'active' | 'completed';
 
 interface UserData {
@@ -608,9 +608,71 @@ export default function App() {
                         <div className="w-full h-1.5 bg-zinc-900 rounded-full overflow-hidden"><motion.div initial={{ width: 0 }} animate={{ width: '85%' }} className="h-full bg-primary shadow-[0_0_10px_rgba(197,168,128,0.5)]" /></div>
                      </div>
                   </div>
+                  
+                  <h3 className="text-[10px] font-black text-zinc-600 uppercase tracking-widest pl-2 mt-10 text-left">Finanzas y Escrow</h3>
+                  <div onClick={() => setScreen('wallet')} className="glass-card bg-[#0a0b0d] p-5 rounded-[28px] border border-primary/20 flex flex-row items-center justify-between cursor-pointer active:scale-95 transition-all shadow-[0_0_20px_rgba(197,168,128,0.05)] text-left mb-4">
+                     <div className="flex items-center gap-4 text-left">
+                        <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary border border-primary/20 shadow-inner"><CreditCard size={24} /></div>
+                        <div className="text-left">
+                           <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-[3px] text-left">Capital Protegido</p>
+                           <p className="text-xl font-black text-white italic text-left">{role === 'male' ? '$12,500' : '$2,000'}</p>
+                        </div>
+                     </div>
+                     <ChevronLeft size={20} className="text-primary rotate-180 opacity-60" />
+                  </div>
                </div>
             </div>
             <Navbar active="profile" role={role} onNav={(s) => setScreen(s)} />
+          </div>
+        );
+
+      case 'wallet':
+        return (
+          <div className="h-full flex flex-col bg-[#050607]">
+            <header className="px-6 pt-6 flex justify-between items-center mb-6 text-left">
+              <button onClick={() => setScreen('profile')} className="w-11 h-11 glass rounded-full flex items-center justify-center text-primary active:scale-95 transition-all"><ChevronLeft size={20} /></button>
+              <h1 className="text-xl font-black italic tracking-tighter text-white">Capital Elite</h1>
+              <div className="w-11 h-11 border border-primary/30 rounded-full flex justify-center items-center text-primary shadow-[0_0_20px_rgba(197,168,128,0.2)] bg-primary/10"><ShieldCheck size={20} /></div>
+            </header>
+            
+            <div className="flex-1 px-8 overflow-y-auto pb-10 scrollbar-hide text-center pt-8">
+              <div className="text-center mb-14">
+                 <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">Balance Disponible en Escrow</p>
+                 <h2 className="text-6xl font-black italic tracking-tighter text-white mb-4">{role === 'male' ? '$12,500' : '$2,000'}</h2>
+                 <p className="text-[9px] text-primary font-bold uppercase tracking-[4px] mt-2 inline-flex items-center gap-2 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20"><Lock size={12} /> Alta Seguridad Institucional</p>
+              </div>
+
+              <div className="flex gap-4 mb-14">
+                 <button onClick={() => toast("ABRIENDO CONEXIÓN STRIPE...", "gold")} className="flex-1 py-5 btn-gold rounded-3xl text-[10px] font-black uppercase tracking-[3px] shadow-primary/30 active:scale-95 transition-all focus:outline-none">Ingresar</button>
+                 <button onClick={() => toast("RETIROS RESTRINGIDOS (MVP)", "danger")} className="flex-1 py-5 glass border-white/10 rounded-3xl text-[10px] font-black uppercase tracking-[3px] text-zinc-300 active:scale-95 transition-all focus:outline-none hover:border-white/30">Retirar</button>
+              </div>
+
+              <div className="space-y-6 text-left">
+                 <h3 className="text-[10px] font-black text-zinc-600 uppercase tracking-widest pl-2">Actividad Reciente</h3>
+                 <div className="space-y-4">
+                    <div className="glass-card bg-zinc-950 p-6 rounded-[32px] border border-white/5 flex items-center justify-between">
+                       <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary"><Lock size={20} /></div>
+                          <div>
+                             <p className="text-sm font-black text-white">Prot. Santorini</p>
+                             <p className="text-[9px] text-zinc-500 font-bold uppercase mt-1 tracking-widest">Fondos Retenidos</p>
+                          </div>
+                       </div>
+                       <p className="text-sm font-black text-white italic">-$2,500</p>
+                    </div>
+                    <div className="glass-card bg-zinc-950 p-6 rounded-[32px] border border-white/5 flex items-center justify-between">
+                       <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-2xl bg-safe/10 border border-safe/20 flex items-center justify-center text-safe"><Award size={20} /></div>
+                          <div>
+                             <p className="text-sm font-black text-white">Membresía</p>
+                             <p className="text-[9px] text-zinc-500 font-bold uppercase mt-1 tracking-widest">Suscripción Platinum</p>
+                          </div>
+                       </div>
+                       <p className="text-sm font-black text-white italic">-$499</p>
+                    </div>
+                 </div>
+              </div>
+            </div>
           </div>
         );
 
@@ -635,7 +697,7 @@ export default function App() {
                     {savedProtocols.map(p => (
                        <button key={p.id} onClick={() => setCustomRules(p.rules)} className="flex-shrink-0 px-5 py-3 glass rounded-2xl border-white/5 text-[10px] font-black text-zinc-400 uppercase tracking-widest hover:border-primary/40 transition-all font-display">{p.name}</button>
                     ))}
-                    <button className="flex-shrink-0 w-10 h-10 glass rounded-2xl flex items-center justify-center border-dashed border-white/10 text-zinc-600"><Plus size={18} /></button>
+                    <button onClick={() => toast("CREADOR DE PLANTILLAS V2", "gold")} className="flex-shrink-0 w-10 h-10 glass rounded-2xl flex items-center justify-center border-dashed border-white/10 text-zinc-600 hover:text-white transition-colors active:scale-95"><Plus size={18} /></button>
                  </div>
               </div>
               
