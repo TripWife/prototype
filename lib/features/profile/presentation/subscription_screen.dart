@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/widgets/tw_button.dart';
+import '../../../core/widgets/glass_widgets.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
@@ -16,20 +16,45 @@ class SubscriptionScreen extends StatefulWidget {
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
   int _selectedTier = 0;
 
+  final _tiers = [
+    _Tier('Silver', AppConstants.silverPrice.toInt(), null, [
+      '3 contacts per month',
+      '2 video calls per week',
+      'Basic profile',
+      'Standard support',
+    ]),
+    _Tier('Gold', AppConstants.goldPrice.toInt(), 'POPULAR', [
+      '10 contacts per month',
+      'Unlimited video calls',
+      'Highlighted profile',
+      'Priority support',
+      'See who viewed you',
+    ]),
+    _Tier('Platinum', AppConstants.platinumPrice.toInt(), 'EXCLUSIVE', [
+      'Unlimited contacts',
+      'Unlimited video calls',
+      'Featured profile',
+      'VIP support',
+      'See who viewed you',
+      'Priority matching',
+      'Exclusive events access',
+    ]),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+      body: GlassBackground.standard(
         child: SafeArea(
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios),
+                      icon: Icon(Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white.withValues(alpha: 0.8), size: 20),
                       onPressed: () => context.pop(),
                     ),
                     const Spacer(),
@@ -39,91 +64,22 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   ],
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text('Unlock the full TripWife experience',
+                    style: AppTextStyles.bodySmall),
+              ),
               Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Unlock the full TripWife experience',
-                        style: AppTextStyles.bodyMedium
-                            .copyWith(color: AppColors.mediumGrey),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Tier cards
-                      _TierCard(
-                        tier: 'Silver',
-                        price: AppConstants.silverPrice,
-                        features: [
-                          '${AppConstants.silverContactsPerMonth} contacts per month',
-                          '${AppConstants.silverCallsPerWeek} video calls per week',
-                          'Basic profile',
-                          'Standard support',
-                        ],
-                        isSelected: _selectedTier == 0,
-                        onTap: () => setState(() => _selectedTier = 0),
-                      ).animate().fadeIn(delay: 100.ms),
-
-                      const SizedBox(height: 12),
-
-                      _TierCard(
-                        tier: 'Gold',
-                        price: AppConstants.goldPrice,
-                        badge: 'POPULAR',
-                        features: [
-                          '${AppConstants.goldContactsPerMonth} contacts per month',
-                          'Unlimited video calls',
-                          'Highlighted profile',
-                          'Priority support',
-                          'See who viewed you',
-                        ],
-                        isSelected: _selectedTier == 1,
-                        isRecommended: true,
-                        onTap: () => setState(() => _selectedTier = 1),
-                      ).animate().fadeIn(delay: 200.ms),
-
-                      const SizedBox(height: 12),
-
-                      _TierCard(
-                        tier: 'Platinum',
-                        price: AppConstants.platinumPrice,
-                        badge: 'EXCLUSIVE',
-                        features: [
-                          'Unlimited contacts',
-                          'Unlimited video calls',
-                          'Top of discovery feed',
-                          'Personal concierge',
-                          'Express verification (24h)',
-                          'Exclusive badges',
-                        ],
-                        isSelected: _selectedTier == 2,
-                        onTap: () => setState(() => _selectedTier = 2),
-                      ).animate().fadeIn(delay: 300.ms),
-
-                      const SizedBox(height: 24),
-
-                      TwButton(
-                        label: 'Subscribe Now',
-                        icon: Icons.diamond_rounded,
-                        width: double.infinity,
-                        onPressed: () {
-                          // TODO: Open external Stripe payment
-                        },
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      Text(
-                        'Payment processed outside the app via Stripe.\nCancel anytime.',
-                        style: AppTextStyles.caption,
-                        textAlign: TextAlign.center,
-                      ),
-
-                      const SizedBox(height: 20),
-                    ],
-                  ),
+                child: ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+                  itemCount: _tiers.length,
+                  itemBuilder: (_, i) => _TierCard(
+                    tier: _tiers[i],
+                    isSelected: i == _selectedTier,
+                    onTap: () => setState(() => _selectedTier = i),
+                  ).animate().fadeIn(
+                      delay: Duration(milliseconds: 100 + i * 100),
+                      duration: 400.ms),
                 ),
               ),
             ],
@@ -134,68 +90,52 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 }
 
-class _TierCard extends StatelessWidget {
-  final String tier;
-  final double price;
+class _Tier {
+  final String name;
+  final int price;
   final String? badge;
   final List<String> features;
+  const _Tier(this.name, this.price, this.badge, this.features);
+}
+
+class _TierCard extends StatelessWidget {
+  final _Tier tier;
   final bool isSelected;
-  final bool isRecommended;
   final VoidCallback onTap;
 
   const _TierCard({
     required this.tier,
-    required this.price,
-    this.badge,
-    required this.features,
     required this.isSelected,
-    this.isRecommended = false,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: 250.ms,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.accent.withValues(alpha: 0.08)
-              : AppColors.primaryLight,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? AppColors.accent : Colors.transparent,
-            width: 2,
-          ),
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: GlassContainer(
+        onTap: onTap,
+        borderRadius: 24,
+        opacity: isSelected ? 0.14 : 0.07,
+        borderOpacity: isSelected ? 0.35 : 0.1,
+        tintColor: isSelected ? AppColors.accent : Colors.white,
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Text(tier, style: AppTextStyles.heading3),
-                const SizedBox(width: 8),
-                if (badge != null)
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: isRecommended
-                          ? AppColors.accent
-                          : AppColors.rose,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      badge!,
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 10,
-                      ),
-                    ),
+                Text(tier.name,
+                    style: AppTextStyles.heading2.copyWith(fontSize: 22)),
+                if (tier.badge != null) ...[
+                  const SizedBox(width: 10),
+                  GlassBadge(
+                    text: tier.badge!,
+                    color: tier.badge == 'POPULAR'
+                        ? AppColors.accent
+                        : const Color(0xFFAB68FF),
                   ),
+                ],
                 const Spacer(),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -203,12 +143,12 @@ class _TierCard extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('\u20AC',
-                            style: AppTextStyles.bodyMedium
-                                .copyWith(color: AppColors.accent)),
-                        Text('${price.toInt()}',
-                            style: AppTextStyles.heading1
-                                .copyWith(color: AppColors.accent, fontSize: 28)),
+                        Text('€',
+                            style: AppTextStyles.priceCurrency
+                                .copyWith(fontSize: 14)),
+                        Text('${tier.price}',
+                            style: AppTextStyles.price
+                                .copyWith(fontSize: 32, color: Colors.white)),
                       ],
                     ),
                     Text('/month', style: AppTextStyles.caption),
@@ -216,46 +156,30 @@ class _TierCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            ...features.map(
+            const SizedBox(height: 20),
+            ...tier.features.map(
               (f) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(bottom: 10),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.check_circle_rounded,
-                      color: isSelected ? AppColors.accent : AppColors.mediumGrey,
-                      size: 18,
-                    ),
+                    Icon(Icons.check_circle_rounded,
+                        size: 18,
+                        color: isSelected
+                            ? AppColors.accent
+                            : AppColors.success.withValues(alpha: 0.6)),
                     const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(f,
-                          style: AppTextStyles.bodySmall
-                              .copyWith(color: AppColors.lightGrey)),
-                    ),
+                    Text(f, style: AppTextStyles.bodyMedium),
                   ],
                 ),
               ),
             ),
-            if (isSelected) ...[
-              const SizedBox(height: 4),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'Selected',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.accent,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
+            const SizedBox(height: 16),
+            GlassButton(
+              label: isSelected ? 'Selected' : 'Select Plan',
+              width: double.infinity,
+              isPrimary: isSelected,
+              onPressed: isSelected ? () {} : onTap,
+            ),
           ],
         ),
       ),

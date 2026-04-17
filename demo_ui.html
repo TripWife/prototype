@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripWife - Interactive Business Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #030405;
+            --primary: #c5a880; /* Gold */
+            --primary-light: #dfc8a5;
+            --secondary: #0f1116;
+            --accent: #45a29e;
+            --danger: #e94560;
+            --safe: #2ecc71;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #8e9297;
+            --gold-gradient: linear-gradient(135deg, #c5a880 0%, #ebd3a8 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { display: none; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+
+        .presenter-controls { position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.8); border: 1px solid var(--primary); padding: 15px; border-radius: 12px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; backdrop-filter: blur(10px); }
+        .presenter-controls button { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: 0.2s; }
+        .presenter-controls button:hover { background: var(--primary); color: #000; }
+        .presenter-title { font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 5px; text-align: center; }
+
+        .mobile-frame { width: 390px; height: 844px; border-radius: 50px; background: #000; position: relative; box-shadow: 0 50px 100px rgba(0,0,0,0.9), 0 0 0 12px #121212; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; display: flex; flex-direction: column; }
+        .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 140px; height: 30px; background: #121212; border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; z-index: 1000; }
+
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; background: var(--bg-color); z-index: 10; padding-top: 40px; }
+        .screen.active { display: flex; animation: fadeSlide 0.3s ease; }
+        @keyframes fadeSlide { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        .header { padding: 30px 20px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .header h1 { font-size: 26px; font-weight: 700; color: #fff; }
+        .icon-btn { width: 40px; height: 40px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 50%; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(10px); cursor: pointer; transition: 0.3s; color: #fff;}
+        .icon-btn:hover { background: rgba(255,255,255,0.1); }
+
+        .scroll-area { flex: 1; padding: 0 20px; overflow-y: auto; padding-bottom: 110px; position: relative; }
+        .glass-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 18px; backdrop-filter: blur(30px); margin-bottom: 16px; position:relative; }
+        
+        .btn { width: 100%; padding: 16px; border-radius: 16px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .btn-gold { background: var(--gold-gradient); color: #000; box-shadow: 0 5px 20px rgba(197, 168, 128, 0.15); }
+        .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: #fff; }
+        .btn-safe { background: rgba(46, 204, 113, 0.1); color: var(--safe); border: 1px solid var(--safe); }
+        .btn-danger { background: rgba(233, 69, 96, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+
+        .nav-bar { position: absolute; bottom: 25px; left: 20px; right: 20px; height: 70px; background: rgba(15,17,22,0.9); border: 1px solid var(--glass-border); border-radius: 25px; backdrop-filter: blur(20px); display: none; justify-content: space-around; align-items: center; z-index: 1000; }
+        .nav-icon { color: #555; font-size: 20px; padding: 10px; cursor: pointer; transition: 0.3s; position:relative; }
+        .nav-icon.active { color: var(--primary); }
+        .badge { position: absolute; top: 0; right: 0; background: var(--danger); width: 8px; height: 8px; border-radius: 50%; opacity: 0; transition: opacity 0.3s; }
+
+        /* Tags */
+        .tag { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-right: 5px; margin-bottom: 5px; }
+        .tag-amber { background: rgba(197, 168, 128, 0.1); color: var(--primary); border: 1px solid rgba(197,168,128,0.2); }
+        .tag-safe { background: rgba(46, 204, 113, 0.1); color: var(--safe); }
+        
+        /* Elements */
+        .sig-pad { width: 100%; height: 180px; background: #08090a; border: 1px dashed var(--primary); border-radius: 16px; margin: 20px 0; touch-action: none; position:relative; }
+        .sig-pad p { position:absolute; top: 50%; left:50%; transform:translate(-50%,-50%); color: #444; font-size:12px; pointer-events: none;}
+        
+        /* Custom Checkbox */
+        .checkbox-row { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--glass-border); cursor: pointer;}
+        .checkbox-row.checked { border-color: var(--primary); background: rgba(197, 168, 128, 0.05); }
+
+        .toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background: rgba(197, 168, 128, 0.9); color: #000; padding: 16px 20px; border-radius: 16px; font-weight: 600; font-size: 14px; z-index: 9999; display: flex; align-items: center; gap: 10px; opacity: 0; transition: 0.3s; pointer-events: none; }
+        .toast.show { opacity: 1; top: 70px; }
+    </style>
+</head>
+<body>
+
+    <!-- CONTROL DEL INVERSOR / PRESENTADOR -->
+    <div class="presenter-controls">
+        <div class="presenter-title">Demo Engine</div>
+        <button onclick="APP.switchRole('male')" id="btn-ctrl-male">Simular Teléfono ÉL</button>
+        <button onclick="APP.switchRole('female')" id="btn-ctrl-female" style="border-color:#555; color:#555;">Simular Teléfono ELLA</button>
+        <button onclick="APP.resetState()" style="border-color:var(--danger); color:var(--danger); margin-top:20px;">Reset Demo</button>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast"><i class="fa-solid fa-circle-check"></i> <span id="toast-msg"></span></div>
+
+    <div class="mobile-frame">
+        <div class="notch"></div>
+
+        <!-- 1. SPLASH -->
+        <div id="view-splash" class="screen active" style="justify-content: center; align-items: center; text-align:center;">
+            <h1 style="font-size: 40px; font-weight: 800; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">TripWife</h1>
+            <p style="color: #555; font-size: 11px; letter-spacing: 3px; margin: 10px 0 50px;">ELITE NETWORK</p>
+            <div style="width: 280px;">
+                <button class="btn btn-gold" onclick="APP.startRoleFlow('male')">Acceso Caballeros</button>
+                <button class="btn btn-outline" style="margin-top:10px;" onclick="APP.startRoleFlow('female')">Acceso Viajeras</button>
+            </div>
+        </div>
+
+        <!-- 2. MALE PAYWALL -->
+        <div id="view-paywall" class="screen">
+            <div class="scroll-area" style="padding-top: 60px;">
+                <h2 style="font-size: 26px; text-align:center;">Privacidad Asegurada</h2>
+                <p style="color:#888; text-align:center; font-size:13px; margin-bottom: 30px;">Requiere validación Platinum.</p>
+                
+                <div class="glass-card" style="border-color: var(--primary);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 20px;">
+                        <div>
+                            <span class="tag tag-amber">100% DISCRETO</span>
+                            <h3 style="font-size:30px; margin-top:5px; color:var(--primary);">Platinum</h3>
+                        </div>
+                        <h4 style="font-size:24px; font-weight:300;">$499<span style="font-size:12px; color:#555;"> /mes</span></h4>
+                    </div>
+                    <div style="font-size:13px; color:#ccc; line-height:2.4;">
+                        <i class="fa-solid fa-check" style="color:var(--primary); margin-right:8px;"></i> Acceso a Viajeras Verificadas (KYC)<br>
+                        <i class="fa-solid fa-check" style="color:var(--primary); margin-right:8px;"></i> Despliegue Legal (Contratos Formales)<br>
+                        <i class="fa-solid fa-check" style="color:var(--primary); margin-right:8px;"></i> Red Networking Empresarial<br>
+                        <i class="fa-solid fa-check" style="color:var(--primary); margin-right:8px;"></i> Conserje Privado (Yates, Eventos)
+                    </div>
+                    <button class="btn btn-gold" style="margin-top:30px;" onclick="APP.buySubscription()">Procesar Pago e Ingresar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. HUB / DISCOVERY -->
+        <div id="view-hub" class="screen">
+            <header class="header">
+                <div>
+                   <h1 style="font-size: 28px;">Live Hub</h1>
+                   <p style="color: var(--primary); font-size:12px; font-weight:600;" id="hub-subtitle"></p>
+                </div>
+            </header>
+            
+            <div id="hub-live-section" style="padding: 0 20px 15px; border-bottom: 1px solid var(--glass-border); display:none;">
+                <p style="font-size: 10px; color:#666; text-transform: uppercase; margin-bottom: 12px; font-weight:700;"><i class="fa-solid fa-eye" style="color:var(--danger)"></i> En Directo Ahora</p>
+                <div style="display: flex; gap: 15px; overflow-x: auto;">
+                    <div style="text-align:center; position:relative; cursor:pointer;" onclick="APP.openInteraction('Isabella')">
+                        <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=150" style="width:60px; height:60px; border-radius:50%; border:2px solid var(--primary); object-fit:cover;">
+                        <span style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); background:var(--danger); font-size:8px; font-weight:800; padding:2px 4px; border-radius:4px;">LIVE</span>
+                        <p style="font-size:10px; margin-top:5px; color:#ccc;">Isabella</p>
+                    </div>
+                    <div style="text-align:center; cursor:pointer;">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150" style="width:60px; height:60px; border-radius:50%; border:2px solid #444; object-fit:cover;">
+                        <p style="font-size:10px; margin-top:5px; color:#555;">Networking</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scroll-area" style="padding-top: 15px;" id="hub-content">
+                <!-- Renderizado por JS -->
+            </div>
+        </div>
+
+        <!-- 4. CHAT INTERNO -->
+        <div id="view-chat" class="screen">
+            <header class="header" style="background: rgba(0,0,0,0.6); backdrop-filter:blur(10px); z-index:20;">
+                <div style="display:flex; align-items:center; gap: 15px;">
+                    <i class="fa-solid fa-arrow-left" style="font-size:18px; cursor:pointer;" onclick="APP.nav('hub')"></i>
+                    <img id="chat-u-img" src="" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;">
+                    <div>
+                        <h3 id="chat-u-name" style="font-size: 16px;">Name</h3>
+                        <p style="font-size: 10px; color: var(--safe);"><i class="fa-solid fa-lock" style="font-size:8px;"></i> Chat Encriptado</p>
+                    </div>
+                </div>
+                <div class="icon-btn" onclick="alert('Funcionalidad de Video Directo lanzada.')"><i class="fa-solid fa-video" style="color:var(--primary);"></i></div>
+            </header>
+            
+            <div id="chat-status-banner" style="background: var(--glass-bg); padding: 10px; text-align:center; font-size:11px; color: var(--primary); border-bottom:1px solid var(--glass-border); display:none;">
+                ESTADO: <span id="chat-status-text"></span>
+            </div>
+
+            <div class="scroll-area" id="chat-messages" style="display:flex; flex-direction:column; padding: 20px; gap: 15px;"></div>
+            
+            <div id="chat-input-area" style="padding: 15px 20px 30px; background: #050608; border-top: 1px solid var(--glass-border);">
+                <!-- Acciones renderizadas (Crear Acuerdo, Ver Acuerdo, Bloqueado) -->
+            </div>
+        </div>
+
+        <!-- 5. MALE: REDACTAR ACUERDO JURÍDICO -->
+        <div id="view-contract-create" class="screen">
+            <header class="header">
+                <i class="fa-solid fa-arrow-left" style="font-size:18px; cursor:pointer;" onclick="APP.nav('chat')"></i>
+                <h2 style="font-size: 20px;">Redactar Acuerdo</h2>
+                <div style="width:18px;"></div>
+            </header>
+            <div class="scroll-area" style="padding-top:10px;">
+                <p style="font-size: 13px; color: #888; margin-bottom: 20px;">Las reglas de privacidad marcadas aquí serán vinculantes si ella acepta el depósito Escrow.</p>
+                
+                <h4 style="font-size: 12px; color: var(--primary); margin-bottom: 10px; text-transform:uppercase;">Cláusulas de Privacidad</h4>
+                <div class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+                    <i class="fa-solid fa-camera-slash" style="color:var(--primary); width:20px; text-align:center;"></i>
+                    <div style="flex:1;"><p style="font-size:14px; color:#fff;">Privacidad de Imagen</p><p style="font-size:10px; color:#666;">Sin publicaciones orgánicas en Redes Sociales.</p></div>
+                    <i class="fa-solid fa-circle-check" style="color:var(--primary);"></i>
+                </div>
+                <div class="checkbox-row checked" onclick="this.classList.toggle('checked')">
+                    <i class="fa-solid fa-user-lock" style="color:var(--primary); width:20px; text-align:center;"></i>
+                    <div style="flex:1;"><p style="font-size:14px; color:#fff;">Acuerdo NDA Completo</p><p style="font-size:10px; color:#666;">Protección legal contra difamación.</p></div>
+                    <i class="fa-solid fa-circle-check" style="color:var(--primary);"></i>
+                </div>
+                <div class="checkbox-row" onclick="this.classList.toggle('checked')">
+                    <i class="fa-solid fa-map-location-dot" style="color:#555; width:20px; text-align:center;"></i>
+                    <div style="flex:1;"><p style="font-size:14px; color:#ccc;">Itinerario Secreto</p><p style="font-size:10px; color:#666;">No compartir geo-localización real.</p></div>
+                    <i class="fa-solid fa-circle-check" style="color:transparent;"></i>
+                </div>
+
+                <div class="glass-card" style="margin-top: 30px; text-align:center; border-color:var(--primary);">
+                    <p style="font-size: 11px; color:#888;">FONDO ESCROW (GARANTÍA DE LA VIAJERA)</p>
+                    <h2 style="color: var(--primary); font-size: 36px; margin: 5px 0;">$2,500</h2>
+                    <p style="font-size: 11px; color:#555;">Se pre-autorizará de tu cuenta al firmar.</p>
+                </div>
+                <button class="btn btn-gold" onclick="APP.sendContract()">Firmar Digitalmente y Enviar</button>
+            </div>
+        </div>
+
+        <!-- 6. FEMALE: FIRMA DIGITAL DEL CONTRATO -->
+        <div id="view-contract-sign" class="screen">
+            <header class="header">
+                <i class="fa-solid fa-arrow-left" style="font-size:18px; cursor:pointer;" onclick="APP.nav('chat')"></i>
+                <h2 style="font-size: 18px;">Propuesta Legal</h2>
+                <div style="width:18px;"></div>
+            </header>
+            <div class="scroll-area">
+                <div class="glass-card" style="border-color:var(--primary);">
+                    <p style="font-size: 10px; color:var(--primary); letter-spacing:1px; margin-bottom:5px;">GARANTÍA DE SEGURIDAD</p>
+                    <h2 style="font-size:24px;">$2,500.00 <span style="font-size:12px; font-weight:400; color:var(--safe);">BLOQUEADOS</span></h2>
+                    <p style="font-size:12px; color:#888; margin-top:8px;">Este dinero está en custodia por TripWife y avala tu retorno seguro desde cualquier destino.</p>
+                </div>
+                
+                <h4 style="font-size: 13px; color: #fff; margin: 25px 0 10px;">Condiciones del Caballero:</h4>
+                <div style="background:rgba(0,0,0,0.5); padding:15px; border-radius:12px; border:1px solid var(--glass-border);">
+                    <p style="font-size:13px; color:#ccc; margin-bottom:10px;">• El rostro del cliente no será publicado.</p>
+                    <p style="font-size:13px; color:#ccc; margin-bottom:10px;">• Aceptas el acuerdo de NDA oficial de la plataforma.</p>
+                    <p style="font-size:11px; color:var(--danger); margin-top:15px;"><i class="fa-solid fa-triangle-exclamation"></i> Tu protección financiera se rompe si incumples la privacidad.</p>
+                </div>
+
+                <div class="sig-pad" id="signature-pad">
+                    <p id="sig-placeholder">Desliza o dibuja tu firma para aceptar</p>
+                    <canvas id="sig-canvas" style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:2; cursor:crosshair;"></canvas>
+                </div>
+
+                <button class="btn btn-gold" id="btn-submit-sign" onclick="APP.acceptContract()" disabled>Firmar Contrato Oficial</button>
+            </div>
+        </div>
+
+        <!-- 7. VIAJES & CONSERJE -->
+        <div id="view-trips" class="screen">
+            <header class="header"><h1 style="font-size:28px;">Gestión de Viaje</h1></header>
+            <div class="scroll-area" id="trip-content">
+                <!-- Render Dinámico -->
+            </div>
+            <!-- BOTÓN SOS PARA ELLA -->
+            <div id="sos-btn" style="position:fixed; bottom: 100px; right:20px; width:50px; height:50px; background:var(--danger); border-radius:50%; display:none; justify-content:center; align-items:center; color:#fff; box-shadow: 0 5px 20px rgba(233,69,96,0.5); cursor:pointer; z-index:50;" onclick="alert('SISTEMA SOS ACTIVADO.\nSoporte VIP interviniendo y vuelos de vuelta asegurados con el Escrow.')"><i class="fa-solid fa-shield-halved" style="font-size:22px;"></i></div>
+        </div>
+
+        <!-- 8. FEEDBACK / MEDALLAS -->
+        <div id="view-feedback" class="screen" style="z-index:100;">
+            <div class="scroll-area" style="padding-top:60px; text-align:center;">
+                <i class="fa-solid fa-check-circle" style="font-size:60px; color:var(--safe); margin-bottom:20px;"></i>
+                <h2 style="font-size:24px; margin-bottom:10px;">Escrow Liberado</h2>
+                <p style="font-size:13px; color:#888; margin-bottom:40px;">El viaje ha culminado en seguridad.</p>
+
+                <h4 style="font-size:16px; margin-bottom:20px;">Valora la experiencia (Anónimo)</h4>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; text-align:left;">
+                    <div class="glass-card" onclick="this.classList.toggle('active-medal')" style="cursor:pointer; padding:15px; margin:0;" >
+                        <i class="fa-solid fa-comments" style="color:var(--primary); font-size:24px; margin-bottom:10px;"></i>
+                        <h4 style="font-size:13px;">Gran Conversación</h4>
+                    </div>
+                    <div class="glass-card" onclick="this.classList.toggle('active-medal')" style="cursor:pointer; padding:15px; margin:0;">
+                        <i class="fa-solid fa-gem" style="color:var(--primary); font-size:24px; margin-bottom:10px;"></i>
+                        <h4 style="font-size:13px;">Experiencia Elite</h4>
+                    </div>
+                    <div class="glass-card" onclick="this.classList.toggle('active-medal')" style="cursor:pointer; padding:15px; margin:0;">
+                         <i class="fa-solid fa-handshake" style="color:var(--primary); font-size:24px; margin-bottom:10px;"></i>
+                        <h4 style="font-size:13px;">Absoluto Respeto</h4>
+                    </div>
+                </div>
+                
+                <p style="font-size:11px; color:#555; margin:30px 0;">TripWife no admite comentarios de texto libre para proteger a nuestros miembros.</p>
+                <button class="btn btn-outline" style="border-color:var(--primary); color:var(--primary);" onclick="APP.finishFeedback()">Enviar Validación</button>
+            </div>
+            <style>
+                .active-medal { border-color:var(--primary) !important; background: rgba(197, 168, 128, 0.1) !important;}
+            </style>
+        </div>
+
+        <nav class="nav-bar" id="main-nav">
+            <div class="nav-icon active" onclick="APP.nav('hub', this)"><i class="fa-solid fa-compass"></i></div>
+            <div class="nav-icon" onclick="APP.nav('trips', this)"><i class="fa-solid fa-plane-departure"></i><div class="badge" id="nav-badge-trips"></div></div>
+            <div class="nav-icon" onclick="APP.nav('chat', this, true)"><i class="fa-solid fa-message"></i><div class="badge" id="nav-badge-msg"></div></div>
+            <div class="nav-icon" onclick="APP.nav('profile', this)"><i class="fa-solid fa-user-shield"></i></div>
+        </nav>
+    </div>
+
+    <script>
+        /**
+         * STATE MACHINE ENGINE
+         * Maneja toda la lógica real y vista sin recargas.
+         */
+        const STATE = {
+            role: 'none', // 'none', 'male', 'female'
+            isSubscribed: false, // Male needs this
+            tripStatus: 'none', // none -> contract_sent -> contract_signed -> active -> completed
+            escrowAmount: 2500,
+            activeScreen: 'splash',
+            chatTarget: 'Isabella' // Quien es la contraparte actual
+        };
+
+        const DATA = {
+            male: { name: 'Sebastián K.', title: 'Platinum Member', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150' },
+            female: { name: 'Isabella', title: 'Top Traveler', img: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600' }
+        };
+
+        const APP = {
+            /** Inicializa o resetea el Demo */
+            resetState() {
+                STATE.role = 'none'; STATE.isSubscribed = false; STATE.tripStatus = 'none';
+                this.updateUI(); this.nav('splash');
+                this.toast('Demostración reiniciada.');
+            },
+
+            /** Cambia el rol al instante para mostrar a Inversores qué ve el otro dispositivo */
+            switchRole(newRole) {
+                if(newRole === 'none') return;
+                STATE.role = newRole;
+                if(newRole==='male') STATE.isSubscribed = true; // asume que ya pagó si está haciendo demo rápida
+                
+                // Actualiza botones presenter
+                document.getElementById('btn-ctrl-male').style.borderColor = newRole==='male' ? 'var(--primary)' : '#555';
+                document.getElementById('btn-ctrl-male').style.color = newRole==='male' ? 'var(--primary)' : '#555';
+                document.getElementById('btn-ctrl-female').style.borderColor = newRole==='female' ? 'var(--primary)' : '#555';
+                document.getElementById('btn-ctrl-female').style.color = newRole==='female' ? 'var(--primary)' : '#555';
+
+                this.updateUI();
+                this.nav(STATE.tripStatus === 'active' ? 'trips' : 'hub');
+                this.toast(`Simulando vista de: ${newRole === 'male' ? 'Caballero (Él)' : 'Viajera (Ella)'}`);
+            },
+
+            /** Flujo de entrada de la Splash Screen */
+            startRoleFlow(role) {
+                STATE.role = role;
+                if(role === 'male') { this.nav('paywall'); }
+                else { this.switchRole('female'); } // Female instant access (hub)
+            },
+
+            /** Compra la suscripción y lo avienta al HUB */
+            buySubscription() {
+                STATE.isSubscribed = true;
+                this.toast("Activación Platinum Autorizada.");
+                this.switchRole('male');
+            },
+
+            /** Cambiador de Pantallas General */
+            nav(screenId, navEl = null, isDirectChat = false) {
+                if(screenId === 'chat' && isDirectChat) { this.openInteraction(STATE.role === 'male' ? 'Isabella' : 'Sebastián K.'); return; }
+                if(screenId === 'profile') { this.toast("Pantalla de Perfil simulada por ahora."); return; }
+
+                STATE.activeScreen = screenId;
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                const s = document.getElementById('view-' + screenId);
+                if(s) s.classList.add('active');
+
+                // Navbar highlight
+                if(navEl) {
+                    document.querySelectorAll('.nav-icon').forEach(i => i.classList.remove('active'));
+                    navEl.classList.add('active');
+                }
+
+                // Show/hide Navbar
+                document.getElementById('main-nav').style.display = ['hub','trips','chat','profile'].includes(screenId) ? 'flex' : 'none';
+
+                this.renderCurrentView();
+            },
+
+            /** Abre el chat con lógica inyectada */
+            openInteraction(name) {
+                STATE.chatTarget = name;
+                document.getElementById('chat-u-name').innerText = name;
+                document.getElementById('chat-u-img').src = STATE.role === 'male' ? DATA.female.img : DATA.male.img;
+                
+                const msgs = document.getElementById('chat-messages');
+                const actions = document.getElementById('chat-input-area');
+                const banner = document.getElementById('chat-status-banner');
+                
+                msgs.innerHTML = ''; //Limpiar
+                
+                // Mensajes estáticos base
+                if(STATE.role === 'male') {
+                    msgs.innerHTML += `<div style="background:var(--secondary); align-self:flex-start; padding:12px; border-radius:12px; font-size:14px; max-width:85%;">Hola, vi que buscas seguridad y viajes top. Te propongo Santorini.</div>`;
+                } else {
+                    msgs.innerHTML += `<div style="background:var(--secondary); align-self:flex-start; padding:12px; border-radius:12px; font-size:14px; max-width:85%;">Hola Sebastián. Valoro tu perfil Platinum. Me encantaría Santorini si garantizamos la seguridad mutua.</div>`;
+                }
+
+                // Logica de Estado en el Chat
+                banner.style.display = 'block';
+                if(STATE.tripStatus === 'none') {
+                    banner.style.display = 'none';
+                    if(STATE.role === 'male') {
+                        actions.innerHTML = `<button class="btn btn-gold" onclick="APP.nav('contract-create')"><i class="fa-solid fa-file-signature"></i> Proponer Contrato y Escrow</button>`;
+                    } else {
+                        actions.innerHTML = `<p style="font-size:12px; color:#666; text-align:center;">Esperando a que él inicie el marco legal.</p>`;
+                    }
+                } else if(STATE.tripStatus === 'contract_sent') {
+                    if(STATE.role === 'male') {
+                        banner.innerText = 'CONTRATO ENVIADO. ESPERANDO FIRMA.';
+                        actions.innerHTML = `<button class="btn btn-outline" disabled>Escrow ${STATE.escrowAmount}$ Reservado</button>`;
+                    } else {
+                        banner.innerText = 'TIENES UN CONTRATO LEGAL PENDIENTE.';
+                        msgs.innerHTML += `<div style="background:rgba(197, 168, 128, 0.1); border:1px solid var(--primary); align-self:center; padding:15px; border-radius:12px; width:100%; text-align:center; margin-top:20px;"><div class="tag tag-amber" style="margin-bottom:10px;">PROPUESTA OFICIAL</div><br><h2 style="color:var(--primary);">$2,500</h2><p style="font-size:11px; color:#ccc; margin:5px 0 15px;">Custodia de Seguridad</p><button class="btn btn-gold" style="padding:10px; font-size:13px;" onclick="APP.nav('contract-sign')">Revisar e Iniciar Viaje</button></div>`;
+                        actions.innerHTML = '';
+                    }
+                } else {
+                    banner.innerText = 'VIAJE ACTIVO - ESCROW BLOQUEADO VERIFICADO';
+                    banner.style.color = 'var(--safe)';
+                    banner.style.borderColor = 'var(--safe)';
+                    banner.style.background = 'rgba(46, 204, 113, 0.05)';
+                    actions.innerHTML = `<button class="btn btn-safe" onclick="APP.nav('trips')"><i class="fa-solid fa-plane"></i> Ir al Itinerario Concierge</button>`;
+                }
+                
+                this.nav('chat');
+            },
+
+            /** Male envia contrato */
+            sendContract() {
+                STATE.tripStatus = 'contract_sent';
+                this.toast("Contrato enviado. Tú tienes $2500 retenidos preventivamente.");
+                document.getElementById('nav-badge-msg').style.opacity = 1; // Notifica a Ella (visual en demo)
+                this.nav('chat');
+            },
+
+            /** Female acepta contrato */
+            acceptContract() {
+                STATE.tripStatus = 'active';
+                this.toast("Contrato Firmado. Escrow Activado. ¡Viaje 100% Protegido!");
+                document.getElementById('nav-badge-trips').style.opacity = 1; 
+                this.nav('trips');
+            },
+
+            /** Carga contenido principal */
+            renderCurrentView() {
+                if(STATE.activeScreen === 'hub') {
+                    document.getElementById('hub-subtitle').innerText = STATE.role === 'male' ? 'Caballero Platinum' : 'Viajera Verificada';
+                    document.getElementById('hub-live-section').style.display = STATE.role === 'male' ? 'block' : 'none';
+                    
+                    const hubFeed = document.getElementById('hub-content');
+                    if(STATE.role === 'male') {
+                        hubFeed.innerHTML = `
+                            <div class="glass-card" style="padding:0; overflow:hidden;" onclick="APP.openInteraction('Isabella')">
+                                <img src="${DATA.female.img}" style="width:100%; height:320px; object-fit:cover;">
+                                <div style="padding: 15px 20px;">
+                                    <div style="display:flex; gap:5px; margin-bottom:8px;">
+                                        <span class="tag tag-amber">FOTÓGRAFA</span> <span class="tag tag-amber">SANTORINI</span>
+                                    </div>
+                                    <h2 style="font-size:22px;">Isabella, 25</h2>
+                                    <p style="font-size:12px; color:#888;">"Viajo por arte y estética. Valoro el saber estar."</p>
+                                </div>
+                            </div>`;
+                    } else {
+                        hubFeed.innerHTML = `
+                            <div style="text-align:center; margin: 40px 0;">
+                                <i class="fa-solid fa-shield-check" style="font-size:50px; color:var(--safe); margin-bottom:15px;"></i>
+                                <h3 style="font-size:18px;">Protección KYC Activa</h3>
+                                <p style="font-size:12px; color:#888;">Tu perfil solo es visible para caballeros Platinum verificados.</p>
+                            </div>
+                            <h4 style="font-size:13px; color:#ccc; margin-bottom:10px;">Propuestas Recientes</h4>
+                            <div class="glass-card" onclick="APP.openInteraction('Sebastián K.')" style="display:flex; align-items:center; gap:15px; cursor:pointer;">
+                                <img src="${DATA.male.img}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid var(--primary);">
+                                <div><h4 style="color:var(--primary);">Sebastián K.</h4><p style="font-size:11px; color:#aaa;"><i class="fa-solid fa-location-dot"></i> Madrid -> Santorini</p></div>
+                                <i class="fa-solid fa-chevron-right" style="margin-left:auto; color:#444;"></i>
+                            </div>`;
+                    }
+                }
+                
+                if(STATE.activeScreen === 'trips') {
+                    const tripsRoot = document.getElementById('trip-content');
+                    const sosBtn = document.getElementById('sos-btn');
+
+                    document.getElementById('nav-badge-trips').style.opacity = 0;
+
+                    if(STATE.tripStatus !== 'active') {
+                        sosBtn.style.display = 'none';
+                        tripsRoot.innerHTML = `<div style="text-align:center; padding-top:60px; opacity:0.4;"><i class="fa-solid fa-gem" style="font-size:40px; margin-bottom:15px;"></i><p>El portal Concierge se activará cuando confirmes un viaje legal.</p></div>`;
+                        return;
+                    }
+
+                    // Renderice VIAJE ACTIVO
+                    sosBtn.style.display = STATE.role === 'female' ? 'flex' : 'none';
+                    tripsRoot.innerHTML = `
+                        <div class="glass-card" style="border-color:var(--safe); background:rgba(46,204,113,0.02); padding:15px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div><h3 style="color:var(--safe);"><i class="fa-solid fa-plane"></i> Santorini (Grecia)</h3><p style="font-size:11px; color:#888;">Con ${STATE.role==='male'?'Isabella':'Sebastián K.'}</p></div>
+                                <span class="tag tag-safe">VIGENTE</span>
+                            </div>
+                            <div style="margin-top:15px; background:rgba(0,0,0,0.5); padding:10px; border-radius:8px; display:flex; justify-content:space-between;">
+                                <span style="font-size:11px;">Depósito en Custodia:</span><strong style="color:var(--primary);">$${STATE.escrowAmount}</strong>
+                            </div>
+                        </div>
+
+                        <h4 style="font-size:10px; color:#888; text-transform:uppercase; margin: 20px 0 10px;">TripWife Concierge (Solo Platinum)</h4>
+                        
+                        <div class="glass-card" style="padding:15px; display:flex; align-items:center; gap:15px;">
+                            <div style="width:40px; height:40px; background:var(--glass-bg); border-radius:10px; display:flex; justify-content:center; align-items:center;"><i class="fa-solid fa-helicopter" style="color:var(--primary);"></i></div>
+                            <div style="flex:1;"><h4 style="font-size:14px;">Transfer VIP</h4><p style="font-size:10px; color:#888;">Atenas -> Oia. 4 plazas.</p></div>
+                            ${STATE.role === 'male' ? `<button class="btn btn-outline" style="width:auto; padding:8px 12px; margin:0; font-size:11px;" onclick="APP.toast('Comisión enviada. Reservado.')">MIA</button>` : `<i class="fa-solid fa-lock" style="color:#444;"></i>`}
+                        </div>
+
+                        ${STATE.role === 'female' ? `<p style="font-size:10px; color:#666; text-align:center; padding: 20px;">* El caballero gestiona las finanzas. Tu tienes seguridad total mediante el Botón SOS rojo inferior.</p>` : ''}
+
+                        <button class="btn btn-danger" style="margin-top:20px; border:none; background:rgba(255,255,255,0.05); color:#fff;" onclick="APP.nav('feedback')">
+                            Finalizar Experiencia y Liberar Fondos
+                        </button>
+                    `;
+                }
+            },
+
+            /** Finalizacion feedback **/
+            finishFeedback() {
+                STATE.tripStatus = 'none';
+                STATE.activeScreen = 'hub';
+                this.toast("Procedimiento legal cerrado. Depósito reubicado. Reputación actualizada.");
+                this.nav('hub');
+            },
+
+            /** Notificaciones UI */
+            toast(msg) {
+                const toast = document.getElementById('toast');
+                document.getElementById('toast-msg').innerText = msg;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3500);
+            },
+
+            /** UI Updater general (para cuando se cambia el rol en background) */
+            updateUI() {
+                this.renderCurrentView();
+            }
+        };
+
+        // --- SISTEMA DE FIRMA CANVAS (FEMALE) ---
+        (function initSignaturePad() {
+            const canvas = document.getElementById('sig-canvas');
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let hasSigned = false;
+
+            function resize() {
+                const parent = canvas.parentElement;
+                canvas.width = parent.clientWidth;
+                canvas.height = parent.clientHeight;
+                ctx.strokeStyle = '#c5a880';
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+            }
+            window.addEventListener('resize', resize);
+            setTimeout(resize, 500);
+
+            function startDraw(e) {
+                isDrawing = true;
+                document.getElementById('sig-placeholder').style.display='none';
+                draw(e);
+            }
+            function stopDraw() {
+                if(!isDrawing) return;
+                isDrawing = false;
+                ctx.beginPath();
+                if(!hasSigned) {
+                    hasSigned = true;
+                    document.getElementById('btn-submit-sign').disabled = false;
+                    APP.toast("Firma en contrato inteligente capturada.");
+                }
+            }
+            function draw(e) {
+                if(!isDrawing) return;
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            }
+
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDraw);
+            canvas.addEventListener('mouseleave', stopDraw);
+            canvas.addEventListener('touchstart', startDraw, {passive:false});
+            canvas.addEventListener('touchmove', draw, {passive:false});
+            canvas.addEventListener('touchend', stopDraw);
+        })();
+
+        // Start
+        setTimeout(() => APP.toast("Motor Demo Inicializado"), 500);
+    </script>
+</body>
+</html>

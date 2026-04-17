@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background text-white antialiased;
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/5 border border-white/10 backdrop-blur-3xl;
+  }
+  
+  .glass-card {
+    @apply glass rounded-[24px] p-6 shadow-2xl;
+  }
+  
+  .btn-gold {
+    @apply bg-gold-gradient text-black font-semibold px-6 py-4 rounded-2xl transition-all active:scale-95 shadow-lg shadow-primary/10;
+  }
+  
+  .btn-outline {
+    @apply border border-white/10 text-white font-medium px-6 py-4 rounded-2xl transition-all active:scale-95 bg-white/5;
+  }
+
+  /* Custom animations */
+  .fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Hide scrollbar by default for app feel */
+::-webkit-scrollbar {
+  display: none;
+}

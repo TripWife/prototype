@@ -1,10 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/widgets/tw_button.dart';
+import '../../../core/widgets/glass_widgets.dart';
 
 class DepositScreen extends StatelessWidget {
   final String tripId;
@@ -13,18 +14,18 @@ class DepositScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+      body: GlassBackground.standard(
         child: SafeArea(
           child: Column(
             children: [
               // Header
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios),
+                      icon: Icon(Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white.withValues(alpha: 0.8), size: 20),
                       onPressed: () => context.pop(),
                     ),
                     const Spacer(),
@@ -37,56 +38,61 @@ class DepositScreen extends StatelessWidget {
 
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     children: [
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
 
-                      // Shield icon
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.accent.withValues(alpha: 0.1),
-                          border: Border.all(
-                            color: AppColors.accent.withValues(alpha: 0.3),
-                            width: 2,
+                      // Shield icon with glow
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: RadialGradient(
+                                colors: [
+                                  AppColors.accent.withValues(alpha: 0.2),
+                                  AppColors.accent.withValues(alpha: 0),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                        child: const Icon(Icons.shield_rounded,
-                            color: AppColors.accent, size: 48),
+                          GlassContainer(
+                            borderRadius: 40,
+                            padding: const EdgeInsets.all(22),
+                            opacity: 0.12,
+                            tintColor: AppColors.accent,
+                            child: const Icon(Icons.shield_rounded,
+                                size: 36, color: AppColors.accent),
+                          ),
+                        ],
                       ).animate().fadeIn().scale(begin: const Offset(0.9, 0.9)),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
 
-                      // Amount
                       Text(
                         '\$${AppConstants.securityDeposit.toInt()}',
-                        style: AppTextStyles.price,
-                      ).animate().fadeIn(delay: 100.ms),
-                      Text(
-                        AppConstants.depositCurrency,
-                        style: AppTextStyles.priceCurrency,
-                      ),
-
-                      const SizedBox(height: 8),
-                      Text(
-                        'Security Deposit',
-                        style: AppTextStyles.heading3,
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // Trip details card
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryLight,
-                          borderRadius: BorderRadius.circular(16),
+                        style: AppTextStyles.price.copyWith(
+                          fontSize: 48,
+                          color: Colors.white,
                         ),
+                      ).animate().fadeIn(delay: 100.ms),
+                      Text('USD', style: AppTextStyles.priceCurrency)
+                          .animate()
+                          .fadeIn(delay: 150.ms),
+                      Text('Security Deposit', style: AppTextStyles.heading3)
+                          .animate()
+                          .fadeIn(delay: 200.ms),
+
+                      const SizedBox(height: 28),
+
+                      // Trip details
+                      GlassCard(
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('TRIP DETAILS', style: AppTextStyles.label),
                             const SizedBox(height: 16),
@@ -96,30 +102,26 @@ class DepositScreen extends StatelessWidget {
                             _DetailRow(Icons.calendar_month_rounded, 'Dates',
                                 'May 15 - May 25, 2026'),
                             const SizedBox(height: 12),
-                            _DetailRow(Icons.person_rounded, 'Companion',
-                                'Sofia'),
+                            _DetailRow(
+                                Icons.person_rounded, 'Companion', 'Sofia'),
                             const SizedBox(height: 12),
-                            _DetailRow(Icons.timelapse_rounded, 'Duration',
+                            _DetailRow(Icons.timer_rounded, 'Duration',
                                 '10 days'),
                           ],
                         ),
-                      ).animate().fadeIn(delay: 200.ms),
+                      ).animate().fadeIn(delay: 300.ms),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
 
-                      // What it covers
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryLight,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
+                      // What this covers
+                      GlassCard(
+                        tintColor: AppColors.success,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('WHAT THIS COVERS',
-                                style: AppTextStyles.label),
+                                style: AppTextStyles.label
+                                    .copyWith(color: AppColors.success.withValues(alpha: 0.8))),
                             const SizedBox(height: 16),
                             _CoverItem(Icons.flight_land_rounded,
                                 'Return flight if trip ends early'),
@@ -127,90 +129,68 @@ class DepositScreen extends StatelessWidget {
                             _CoverItem(Icons.hotel_rounded,
                                 'Emergency accommodation'),
                             const SizedBox(height: 10),
-                            _CoverItem(Icons.local_taxi_rounded,
+                            _CoverItem(Icons.directions_car_rounded,
                                 'Emergency transportation'),
                             const SizedBox(height: 10),
-                            _CoverItem(Icons.health_and_safety_rounded,
+                            _CoverItem(Icons.attach_money_rounded,
                                 'Unforeseen travel expenses'),
-                          ],
-                        ),
-                      ).animate().fadeIn(delay: 300.ms),
-
-                      const SizedBox(height: 20),
-
-                      // Important notice
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.warning.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.warning.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Icon(Icons.warning_amber_rounded,
-                                color: AppColors.warning, size: 20),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                'This deposit is non-refundable. It will be held by the platform '
-                                'and used only if your companion needs to return early or faces '
-                                'an emergency during the trip.',
-                                style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.warning,
-                                  height: 1.5,
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       ).animate().fadeIn(delay: 400.ms),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
 
-                      // Payment flow info
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryLight,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
+                      // Warning
+                      GlassCard(
+                        tintColor: AppColors.warning,
+                        padding: const EdgeInsets.all(14),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _StepRow('1', 'You place the deposit',
-                                isComplete: false, isActive: true),
-                            _StepRow('2', 'She reviews and confirms',
-                                isComplete: false),
-                            _StepRow('3', 'Trip is officially confirmed',
-                                isComplete: false),
+                            Icon(Icons.warning_amber_rounded,
+                                color: AppColors.warning, size: 20),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'This deposit is non-refundable. It will be held by the platform and used only if your companion needs emergency return assistance.',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.7)),
+                              ),
+                            ),
                           ],
                         ),
-                      ).animate().fadeIn(delay: 450.ms),
+                      ).animate().fadeIn(delay: 500.ms),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 24),
 
-                      // Pay button (opens external Stripe)
-                      TwButton(
-                        label: 'Place Deposit — \$${AppConstants.securityDeposit.toInt()}',
+                      // Process steps
+                      GlassCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('HOW IT WORKS', style: AppTextStyles.label),
+                            const SizedBox(height: 16),
+                            _StepRow('1', 'Place your security deposit'),
+                            const SizedBox(height: 12),
+                            _StepRow('2', 'Review & confirm trip details'),
+                            const SizedBox(height: 12),
+                            _StepRow('3', 'Trip confirmed — start planning!'),
+                          ],
+                        ),
+                      ).animate().fadeIn(delay: 600.ms),
+
+                      const SizedBox(height: 28),
+
+                      GlassButton(
+                        label: 'Pay via Stripe',
                         icon: Icons.lock_rounded,
                         width: double.infinity,
                         onPressed: () {
                           _showPaymentSheet(context);
                         },
-                      ).animate().fadeIn(delay: 500.ms),
+                      ).animate().fadeIn(delay: 700.ms),
 
-                      const SizedBox(height: 8),
-
-                      Text(
-                        'Payment processed securely via Stripe',
-                        style: AppTextStyles.caption,
-                        textAlign: TextAlign.center,
-                      ),
-
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
@@ -225,54 +205,61 @@ class DepositScreen extends StatelessWidget {
   void _showPaymentSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.primary,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.mediumGrey,
-                borderRadius: BorderRadius.circular(2),
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          child: Container(
+            padding: EdgeInsets.fromLTRB(
+                24, 24, 24, MediaQuery.of(ctx).padding.bottom + 24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF151738).withValues(alpha: 0.95),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24)),
+              border: Border(
+                top: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
               ),
             ),
-            const SizedBox(height: 24),
-            const Icon(Icons.open_in_new_rounded,
-                color: AppColors.accent, size: 40),
-            const SizedBox(height: 16),
-            Text('External Payment', style: AppTextStyles.heading3),
-            const SizedBox(height: 8),
-            Text(
-              'You will be redirected to our secure payment page powered by Stripe. '
-              'The payment is processed outside the app.',
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.lightGrey),
-              textAlign: TextAlign.center,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Icon(Icons.open_in_new_rounded,
+                    color: AppColors.accent, size: 32),
+                const SizedBox(height: 16),
+                Text('External Payment', style: AppTextStyles.heading3),
+                const SizedBox(height: 8),
+                Text(
+                  'You will be redirected to Stripe\'s secure payment page to complete the deposit.',
+                  style: AppTextStyles.bodySmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                GlassButton(
+                  label: 'Continue to Stripe',
+                  icon: Icons.lock_rounded,
+                  width: double.infinity,
+                  onPressed: () => Navigator.of(ctx).pop(),
+                ),
+                const SizedBox(height: 12),
+                GlassButton(
+                  label: 'Cancel',
+                  width: double.infinity,
+                  isPrimary: false,
+                  onPressed: () => Navigator.of(ctx).pop(),
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
-            TwButton(
-              label: 'Continue to Payment',
-              icon: Icons.launch_rounded,
-              width: double.infinity,
-              onPressed: () {
-                Navigator.pop(context);
-                // TODO: url_launcher to Stripe checkout
-              },
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Cancel',
-                  style: AppTextStyles.bodySmall
-                      .copyWith(color: AppColors.mediumGrey)),
-            ),
-            const SizedBox(height: 8),
-          ],
+          ),
         ),
       ),
     );
@@ -289,13 +276,13 @@ class _DetailRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, color: AppColors.accent, size: 18),
-        const SizedBox(width: 10),
+        Icon(icon, size: 18, color: Colors.white.withValues(alpha: 0.4)),
+        const SizedBox(width: 12),
         Text(label, style: AppTextStyles.bodySmall),
         const Spacer(),
         Text(value,
             style: AppTextStyles.bodyMedium
-                .copyWith(fontWeight: FontWeight.w500)),
+                .copyWith(fontWeight: FontWeight.w600, color: Colors.white)),
       ],
     );
   }
@@ -310,12 +297,9 @@ class _CoverItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, color: AppColors.success, size: 18),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(text, style: AppTextStyles.bodySmall
-              .copyWith(color: AppColors.lightGrey)),
-        ),
+        Icon(icon, size: 18, color: AppColors.success),
+        const SizedBox(width: 12),
+        Text(text, style: AppTextStyles.bodyMedium),
       ],
     );
   }
@@ -324,52 +308,26 @@ class _CoverItem extends StatelessWidget {
 class _StepRow extends StatelessWidget {
   final String number;
   final String text;
-  final bool isComplete;
-  final bool isActive;
-  const _StepRow(this.number, this.text,
-      {this.isComplete = false, this.isActive = false});
+  const _StepRow(this.number, this.text);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isComplete
-                  ? AppColors.success
-                  : isActive
-                      ? AppColors.accent
-                      : AppColors.primary,
-              border: Border.all(
-                color: isComplete
-                    ? AppColors.success
-                    : isActive
-                        ? AppColors.accent
-                        : AppColors.mediumGrey,
-              ),
-            ),
-            child: Center(
-              child: isComplete
-                  ? const Icon(Icons.check, size: 16, color: AppColors.white)
-                  : Text(number,
-                      style: AppTextStyles.caption.copyWith(
-                        color: isActive ? AppColors.primary : AppColors.mediumGrey,
-                        fontWeight: FontWeight.w700,
-                      )),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(text,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: isActive ? AppColors.white : AppColors.mediumGrey,
-              )),
-        ],
-      ),
+    return Row(
+      children: [
+        GlassContainer(
+          borderRadius: 12,
+          padding: const EdgeInsets.all(8),
+          opacity: 0.12,
+          tintColor: AppColors.accent,
+          child: Text(number,
+              style: TextStyle(
+                  color: AppColors.accent,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700)),
+        ),
+        const SizedBox(width: 12),
+        Expanded(child: Text(text, style: AppTextStyles.bodyMedium)),
+      ],
     );
   }
 }

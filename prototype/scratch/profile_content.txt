@@ -1,0 +1,69 @@
+                        {/* TRUST STATS */}
+                        <div className="grid grid-cols-3 p-5 bg-white/5 border border-white/5 rounded-[32px] backdrop-blur-md">
+                           <div className="text-center group" onClick={() => toast("REPUTACIÓN EXCELENTE", 'gold')}>
+                              <p className="text-[7px] text-zinc-500 font-black uppercase mb-1 tracking-widest group-hover:text-primary transition-colors">Elite Score</p>
+                              <p className="text-xs font-black text-white italic">9.8/10</p>
+                           </div>
+                           <div className="border-x border-white/5 flex flex-col justify-center items-center group cursor-pointer" onClick={() => setShowVouchModal(true)}>
+                              <p className="text-[7px] text-zinc-500 font-black uppercase mb-1 tracking-widest group-hover:text-primary transition-colors">Avales</p>
+                              <p className="text-xs font-black text-primary italic">12 Premiums</p>
+                           </div>
+                           <div className="text-center group">
+                              <p className="text-[7px] text-zinc-500 font-black uppercase mb-1 tracking-widest group-hover:text-primary transition-colors">Respuesta</p>
+                              <p className="text-xs font-black text-white italic">&lt; 15 min</p>
+                           </div>
+                        </div>
+
+                        {/* BIO */}
+                        <div>
+                           <h4 className="text-[8px] font-black text-primary/60 uppercase tracking-[3px] mb-2">Filosofía de Viaje</h4>
+                           <p className="text-zinc-400 text-[13px] leading-relaxed italic opacity-90">{activeUser.bio}</p>
+                        </div>
+
+                        {/* ATTRIBUTES */}
+                        <div className="flex flex-wrap gap-2">
+                           {['Gourmet', 'Yacht Lover', 'Private Art', 'KYC Verified'].map(attr => (
+                              <span key={attr} className="px-4 py-2 bg-zinc-900 border border-white/5 rounded-2xl text-[8px] font-black text-zinc-500 uppercase tracking-widest hover:border-primary/40 hover:text-white transition-all cursor-default">{attr}</span>
+                           ))}
+                        </div>
+
+                        {/* PRIVATE MOMENTS */}
+                        <div>
+                            <div className="flex justify-between items-center mb-4">
+                               <h4 className="text-[8px] font-black text-primary/60 uppercase tracking-[3px]">Momentos Privados</h4>
+                               <p className="text-[8px] text-zinc-600 font-black uppercase tracking-widest">Solo Platinum</p>
+                            </div>
+                            <div className="flex gap-4">
+                               {[1,2,3].map(i => (
+                                  <div key={i} className="flex-1 aspect-square rounded-2xl bg-zinc-900 border border-white/5 flex items-center justify-center overflow-hidden grayscale relative group cursor-pointer" onClick={() => toast("SOLO MIEMBROS PLATINUM", "gold")}>
+                                     <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-10 opacity-100 group-hover:opacity-0 transition-opacity" />
+                                     <Lock size={16} className="text-zinc-700 z-20 relative transition-transform group-hover:scale-125" />
+                                  </div>
+                               ))}
+                            </div>
+                        </div>
+
+                        {/* UNIFIED ACTION HUB */}
+                        <div className="flex gap-3 pt-4">
+                           <button onClick={() => { setIsPreviewing(false); setIsCalling(true); }} className="h-16 w-16 glass rounded-[24px] flex items-center justify-center text-primary border-primary/20 shadow-xl active:scale-95 transition-all hover:bg-primary/5">
+                              <Video size={24} />
+                           </button>
+                           <button onClick={() => handleOpenChat(activeUser)} className="h-16 flex-1 btn-gold rounded-[24px] flex items-center justify-center gap-3 text-xs font-black tracking-[4px] uppercase shadow-[0_10px_30px_rgba(197,168,128,0.3)] active:scale-95 transition-all">
+                              <MessageSquare size={18} />
+                              Iniciar Chat
+                           </button>
+                        </div>
+                     </div>
+
+                     <AnimatePresence>
+                        {showVouchModal && (
+                           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="absolute inset-0 z-[200] flex items-center justify-center px-10 bg-black/80 backdrop-blur-xl" onClick={() => setShowVouchModal(false)}>
+                              <div className="glass p-8 rounded-[40px] border-primary/30 shadow-2xl text-center max-w-sm">
+                                 <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-primary/20"><Gem size={32} className="text-primary" /></div>
+                                 <h4 className="text-primary font-black text-xs mb-3 uppercase tracking-[4px]">Reputación Elite</h4>
+                                 <p className="text-white font-black text-xl italic tracking-tighter mb-4">Avalada por 12 Miembros Platinum</p>
+                                 <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-widest leading-relaxed">Este perfil ha sido verificado manualmente por miembros de confianza en la red privada.</p>
+                              </div>
+                           </motion.div>
+                        )}
+                     </AnimatePresence>

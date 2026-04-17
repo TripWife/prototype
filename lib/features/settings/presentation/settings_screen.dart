@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/widgets/tw_button.dart';
+import '../../../core/widgets/glass_widgets.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -20,17 +20,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+      body: GlassBackground.standard(
         child: SafeArea(
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios),
+                      icon: Icon(Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white.withValues(alpha: 0.8), size: 20),
                       onPressed: () => context.pop(),
                     ),
                     const Spacer(),
@@ -42,26 +42,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Notifications
                       Text('NOTIFICATIONS', style: AppTextStyles.label),
                       const SizedBox(height: 12),
-                      _SettingsToggle(
-                        icon: Icons.notifications_rounded,
-                        label: 'Push Notifications',
-                        value: _pushNotifications,
-                        onChanged: (v) =>
-                            setState(() => _pushNotifications = v),
-                      ),
-                      _SettingsToggle(
-                        icon: Icons.email_rounded,
-                        label: 'Email Notifications',
-                        value: _emailNotifications,
-                        onChanged: (v) =>
-                            setState(() => _emailNotifications = v),
+                      GlassCard(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Column(
+                          children: [
+                            _SettingsToggle(
+                              icon: Icons.notifications_rounded,
+                              label: 'Push Notifications',
+                              value: _pushNotifications,
+                              onChanged: (v) =>
+                                  setState(() => _pushNotifications = v),
+                            ),
+                            GlassDivider(),
+                            _SettingsToggle(
+                              icon: Icons.mail_rounded,
+                              label: 'Email Notifications',
+                              value: _emailNotifications,
+                              onChanged: (v) =>
+                                  setState(() => _emailNotifications = v),
+                            ),
+                          ],
+                        ),
                       ),
 
                       const SizedBox(height: 24),
@@ -69,19 +77,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       // Privacy
                       Text('PRIVACY', style: AppTextStyles.label),
                       const SizedBox(height: 12),
-                      _SettingsToggle(
-                        icon: Icons.circle,
-                        label: 'Show Online Status',
-                        value: _showOnlineStatus,
-                        onChanged: (v) =>
-                            setState(() => _showOnlineStatus = v),
-                      ),
-                      _SettingsToggle(
-                        icon: Icons.access_time_rounded,
-                        label: 'Show Last Active',
-                        value: _showLastActive,
-                        onChanged: (v) =>
-                            setState(() => _showLastActive = v),
+                      GlassCard(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Column(
+                          children: [
+                            _SettingsToggle(
+                              icon: Icons.circle,
+                              label: 'Show Online Status',
+                              value: _showOnlineStatus,
+                              onChanged: (v) =>
+                                  setState(() => _showOnlineStatus = v),
+                            ),
+                            GlassDivider(),
+                            _SettingsToggle(
+                              icon: Icons.access_time_rounded,
+                              label: 'Show Last Active',
+                              value: _showLastActive,
+                              onChanged: (v) =>
+                                  setState(() => _showLastActive = v),
+                            ),
+                          ],
+                        ),
                       ),
 
                       const SizedBox(height: 24),
@@ -89,22 +105,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       // Account
                       Text('ACCOUNT', style: AppTextStyles.label),
                       const SizedBox(height: 12),
-                      _SettingsItem(
-                        icon: Icons.lock_outline,
-                        label: 'Change Password',
-                        onTap: () {},
-                      ),
-                      _SettingsItem(
-                        icon: Icons.email_outlined,
-                        label: 'Change Email',
-                        subtitle: 'john@email.com',
-                        onTap: () {},
-                      ),
-                      _SettingsItem(
-                        icon: Icons.language_rounded,
-                        label: 'Language',
-                        subtitle: 'English',
-                        onTap: () {},
+                      GlassCard(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Column(
+                          children: [
+                            _SettingsItem(
+                              icon: Icons.lock_outline_rounded,
+                              label: 'Change Password',
+                            ),
+                            GlassDivider(),
+                            _SettingsItem(
+                              icon: Icons.mail_outline_rounded,
+                              label: 'Change Email',
+                              subtitle: 'john@email.com',
+                            ),
+                            GlassDivider(),
+                            _SettingsItem(
+                              icon: Icons.language_rounded,
+                              label: 'Language',
+                              subtitle: 'English',
+                            ),
+                          ],
+                        ),
                       ),
 
                       const SizedBox(height: 24),
@@ -112,20 +134,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       // Legal
                       Text('LEGAL', style: AppTextStyles.label),
                       const SizedBox(height: 12),
-                      _SettingsItem(
-                        icon: Icons.description_outlined,
-                        label: 'Terms of Service',
-                        onTap: () {},
-                      ),
-                      _SettingsItem(
-                        icon: Icons.privacy_tip_outlined,
-                        label: 'Privacy Policy',
-                        onTap: () {},
-                      ),
-                      _SettingsItem(
-                        icon: Icons.gavel_rounded,
-                        label: 'Community Guidelines',
-                        onTap: () {},
+                      GlassCard(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Column(
+                          children: [
+                            _SettingsItem(
+                              icon: Icons.description_outlined,
+                              label: 'Terms of Service',
+                            ),
+                            GlassDivider(),
+                            _SettingsItem(
+                              icon: Icons.privacy_tip_outlined,
+                              label: 'Privacy Policy',
+                            ),
+                            GlassDivider(),
+                            _SettingsItem(
+                              icon: Icons.handshake_outlined,
+                              label: 'Community Guidelines',
+                            ),
+                          ],
+                        ),
                       ),
 
                       const SizedBox(height: 24),
@@ -133,56 +161,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       // Support
                       Text('SUPPORT', style: AppTextStyles.label),
                       const SizedBox(height: 12),
-                      _SettingsItem(
-                        icon: Icons.help_outline,
-                        label: 'Help Center',
-                        onTap: () {},
-                      ),
-                      _SettingsItem(
-                        icon: Icons.bug_report_outlined,
-                        label: 'Report a Problem',
-                        onTap: () {},
-                      ),
-                      _SettingsItem(
-                        icon: Icons.info_outline,
-                        label: 'About TripWife',
-                        subtitle: 'v1.0.0',
-                        onTap: () {},
-                      ),
-
-                      const SizedBox(height: 32),
-
-                      // Danger zone
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.error.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.error.withValues(alpha: 0.2),
-                          ),
-                        ),
+                      GlassCard(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('DANGER ZONE',
-                                style: AppTextStyles.label
-                                    .copyWith(color: AppColors.error)),
-                            const SizedBox(height: 12),
-                            TwButton(
-                              label: 'Delete Account',
-                              icon: Icons.delete_forever_rounded,
-                              width: double.infinity,
-                              isOutlined: true,
-                              onPressed: () {
-                                _showDeleteDialog();
-                              },
+                            _SettingsItem(
+                              icon: Icons.help_outline_rounded,
+                              label: 'Help Center',
+                            ),
+                            GlassDivider(),
+                            _SettingsItem(
+                              icon: Icons.bug_report_outlined,
+                              label: 'Report a Problem',
+                            ),
+                            GlassDivider(),
+                            _SettingsItem(
+                              icon: Icons.info_outline_rounded,
+                              label: 'About TripWife',
                             ),
                           ],
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 24),
+
+                      // Danger zone
+                      Text('DANGER ZONE', style: AppTextStyles.label
+                          .copyWith(color: AppColors.error.withValues(alpha: 0.7))),
+                      const SizedBox(height: 12),
+                      GlassCard(
+                        tintColor: AppColors.error,
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: _SettingsItem(
+                          icon: Icons.delete_forever_rounded,
+                          label: 'Delete Account',
+                          isDestructive: true,
+                          onTap: () => _showDeleteDialog(context),
+                        ),
+                      ),
+
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -194,30 +212,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _showDeleteDialog() {
+  void _showDeleteDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.primary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text('Delete Account?', style: AppTextStyles.heading3),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.primaryLight,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('Delete Account', style: AppTextStyles.heading3),
         content: Text(
-          'This action is permanent and cannot be undone. All your data, '
-          'conversations, and trip history will be permanently deleted.',
-          style: AppTextStyles.bodySmall.copyWith(color: AppColors.lightGrey),
+          'Are you sure? This action cannot be undone. All your data, trips, and messages will be permanently deleted.',
+          style: AppTextStyles.bodySmall
+              .copyWith(color: Colors.white.withValues(alpha: 0.7)),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancel',
-                style: AppTextStyles.bodyMedium
-                    .copyWith(color: AppColors.mediumGrey)),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.go('/login');
+            },
             child: Text('Delete',
-                style: AppTextStyles.bodyMedium
-                    .copyWith(color: AppColors.error, fontWeight: FontWeight.w600)),
+                style: TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -240,14 +258,17 @@ class _SettingsToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: AppColors.mediumGrey, size: 22),
-      title: Text(label, style: AppTextStyles.bodyMedium),
-      trailing: Switch.adaptive(
-        value: value,
-        onChanged: onChanged,
-        activeColor: AppColors.accent,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: Colors.white.withValues(alpha: 0.5)),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(label, style: AppTextStyles.bodyMedium),
+          ),
+          GlassToggle(value: value, onChanged: onChanged),
+        ],
       ),
     );
   }
@@ -257,27 +278,55 @@ class _SettingsItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final String? subtitle;
-  final VoidCallback onTap;
+  final bool isDestructive;
+  final VoidCallback? onTap;
 
   const _SettingsItem({
     required this.icon,
     required this.label,
     this.subtitle,
-    required this.onTap,
+    this.isDestructive = false,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: AppColors.mediumGrey, size: 22),
-      title: Text(label, style: AppTextStyles.bodyMedium),
-      subtitle: subtitle != null
-          ? Text(subtitle!, style: AppTextStyles.caption)
-          : null,
-      trailing: const Icon(Icons.chevron_right_rounded,
-          color: AppColors.mediumGrey, size: 22),
+    return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Icon(icon,
+                size: 20,
+                color: isDestructive
+                    ? AppColors.error
+                    : Colors.white.withValues(alpha: 0.5)),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: isDestructive ? AppColors.error : null,
+                    ),
+                  ),
+                  if (subtitle != null)
+                    Text(subtitle!, style: AppTextStyles.caption),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded,
+                size: 20,
+                color: isDestructive
+                    ? AppColors.error.withValues(alpha: 0.5)
+                    : Colors.white.withValues(alpha: 0.2)),
+          ],
+        ),
+      ),
     );
   }
 }

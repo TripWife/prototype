@@ -1,112 +1,184 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/widgets/tw_button.dart';
+import '../../../core/widgets/glass_widgets.dart';
 
-class ProfileDetailScreen extends StatelessWidget {
+class ProfileDetailScreen extends StatefulWidget {
   final String profileId;
-
   const ProfileDetailScreen({super.key, required this.profileId});
+
+  @override
+  State<ProfileDetailScreen> createState() => _ProfileDetailScreenState();
+}
+
+class _ProfileDetailScreenState extends State<ProfileDetailScreen> {
+  int _currentPhoto = 0;
+  final _totalPhotos = 4;
+
+  String get profileId => widget.profileId;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+      body: GlassBackground.standard(
         child: Stack(
           children: [
             CustomScrollView(
               slivers: [
                 // Photo gallery
-                SliverAppBar(
-                  expandedHeight: 420,
-                  pinned: true,
-                  backgroundColor: AppColors.primaryDark,
-                  leading: _CircleBackButton(onTap: () => context.pop()),
-                  actions: [
-                    _CircleIconButton(
-                      icon: Icons.share_rounded,
-                      onTap: () {},
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 420,
+                    child: Stack(
+                      children: [
+                        // Photo placeholder
+                        GestureDetector(
+                          onTapUp: (details) {
+                            final width = MediaQuery.of(context).size.width;
+                            setState(() {
+                              if (details.globalPosition.dx < width / 2) {
+                                _currentPhoto = (_currentPhoto - 1).clamp(0, _totalPhotos - 1);
+                              } else {
+                                _currentPhoto = (_currentPhoto + 1).clamp(0, _totalPhotos - 1);
+                              }
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.white.withValues(alpha: 0.04),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
+                            child: Center(
+                              child: Icon(Icons.person_rounded,
+                                  size: 80,
+                                  color: Colors.white.withValues(alpha: 0.1)),
+                            ),
+                          ),
+                        ),
+                        // Photo indicators
+                        Positioned(
+                          top: MediaQuery.of(context).padding.top + 8,
+                          left: 16,
+                          right: 16,
+                          child: Row(
+                            children: List.generate(
+                              _totalPhotos,
+                              (i) => Expanded(
+                                child: Container(
+                                  height: 3,
+                                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(2),
+                                    color: i == _currentPhoto
+                                        ? AppColors.accent
+                                        : Colors.white.withValues(alpha: 0.2),
+                                    boxShadow: i == _currentPhoto
+                                        ? [BoxShadow(color: AppColors.accent.withValues(alpha: 0.5), blurRadius: 4)]
+                                        : null,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Back button
+                        Positioned(
+                          top: MediaQuery.of(context).padding.top + 16,
+                          left: 16,
+                          child: GlassContainer(
+                            borderRadius: 14,
+                            padding: const EdgeInsets.all(8),
+                            opacity: 0.12,
+                            onTap: () => context.pop(),
+                            child: const Icon(Icons.arrow_back_ios_new_rounded,
+                                color: Colors.white, size: 18),
+                          ),
+                        ),
+                        // Share/Report
+                        Positioned(
+                          top: MediaQuery.of(context).padding.top + 16,
+                          right: 16,
+                          child: Row(
+                            children: [
+                              GlassContainer(
+                                borderRadius: 14,
+                                padding: const EdgeInsets.all(8),
+                                opacity: 0.12,
+                                child: const Icon(Icons.share_rounded,
+                                    color: Colors.white, size: 18),
+                              ),
+                              const SizedBox(width: 8),
+                              GlassContainer(
+                                borderRadius: 14,
+                                padding: const EdgeInsets.all(8),
+                                opacity: 0.12,
+                                child: const Icon(Icons.flag_outlined,
+                                    color: Colors.white, size: 18),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    _CircleIconButton(
-                      icon: Icons.flag_outlined,
-                      onTap: () {},
-                    ),
-                    const SizedBox(width: 12),
-                  ],
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: _PhotoGallery(profileId: profileId),
                   ),
                 ),
 
-                // Profile content
+                // Profile info
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Name, age, verification
+                        // Name & verification
                         Row(
                           children: [
                             Text('Sofia, 27', style: AppTextStyles.heading1),
                             const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: AppColors.accent,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.check,
-                                  color: AppColors.primary, size: 14),
-                            ),
+                            Icon(Icons.verified_rounded,
+                                color: AppColors.accent, size: 24),
                           ],
                         ).animate().fadeIn(),
 
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            const Icon(Icons.location_on_outlined,
-                                color: AppColors.mediumGrey, size: 16),
+                            Icon(Icons.location_on_outlined,
+                                size: 16,
+                                color: Colors.white.withValues(alpha: 0.4)),
                             const SizedBox(width: 4),
                             Text('Barcelona, Spain',
-                                style: AppTextStyles.bodyMedium
-                                    .copyWith(color: AppColors.mediumGrey)),
+                                style: AppTextStyles.bodySmall),
                             const SizedBox(width: 16),
-                            const Icon(Icons.work_outline,
-                                color: AppColors.mediumGrey, size: 16),
+                            Icon(Icons.work_outline_rounded,
+                                size: 16,
+                                color: Colors.white.withValues(alpha: 0.4)),
                             const SizedBox(width: 4),
                             Text('Photographer',
-                                style: AppTextStyles.bodyMedium
-                                    .copyWith(color: AppColors.mediumGrey)),
+                                style: AppTextStyles.bodySmall),
                           ],
                         ).animate().fadeIn(delay: 100.ms),
 
                         const SizedBox(height: 20),
 
-                        // Stats row
-                        Container(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryLight,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              _StatColumn(
-                                  value: '3', label: 'Trips', icon: Icons.flight_rounded),
-                              Container(width: 1, height: 32, color: AppColors.primary),
-                              _StatColumn(
-                                  value: '4.8', label: 'Rating', icon: Icons.star_rounded),
-                              Container(width: 1, height: 32, color: AppColors.primary),
-                              _StatColumn(
-                                  value: '5', label: 'Reviews', icon: Icons.rate_review_rounded),
-                            ],
-                          ),
+                        // Stats
+                        Row(
+                          children: [
+                            _StatPill(icon: Icons.flight_takeoff_rounded, value: '3', label: 'Trips'),
+                            const SizedBox(width: 8),
+                            _StatPill(icon: Icons.star_rounded, value: '4.8', label: 'Rating'),
+                            const SizedBox(width: 8),
+                            _StatPill(icon: Icons.rate_review_outlined, value: '5', label: 'Reviews'),
+                          ],
                         ).animate().fadeIn(delay: 200.ms),
 
                         const SizedBox(height: 24),
@@ -115,12 +187,8 @@ class ProfileDetailScreen extends StatelessWidget {
                         Text('ABOUT', style: AppTextStyles.label),
                         const SizedBox(height: 8),
                         Text(
-                          'Passionate traveler and photographer. I love exploring new cultures, '
-                          'tasting local cuisine, and capturing beautiful moments. Looking for a '
-                          'respectful travel companion to share adventures with. I speak English, '
-                          'Spanish, and a bit of French.',
-                          style: AppTextStyles.bodyMedium
-                              .copyWith(color: AppColors.lightGrey, height: 1.6),
+                          'Freelance photographer with a passion for capturing beautiful moments. Looking for a travel companion who enjoys exploring local culture, trying new cuisines, and going on spontaneous adventures.',
+                          style: AppTextStyles.bodyMedium,
                         ).animate().fadeIn(delay: 300.ms),
 
                         const SizedBox(height: 24),
@@ -131,10 +199,10 @@ class ProfileDetailScreen extends StatelessWidget {
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: ['English', 'Spanish', 'French']
-                              .map((l) => _ChipTag(label: l, icon: Icons.translate))
+                          children: ['Spanish', 'English', 'French']
+                              .map((l) => GlassChip(label: l, icon: Icons.translate_rounded))
                               .toList(),
-                        ).animate().fadeIn(delay: 350.ms),
+                        ).animate().fadeIn(delay: 400.ms),
 
                         const SizedBox(height: 24),
 
@@ -145,58 +213,37 @@ class ProfileDetailScreen extends StatelessWidget {
                           spacing: 8,
                           runSpacing: 8,
                           children: [
-                            'Beach',
-                            'Culture',
-                            'Food & Wine',
-                            'Photography',
-                            'Hiking',
-                            'Art',
-                          ]
-                              .map((i) => _ChipTag(label: i))
-                              .toList(),
-                        ).animate().fadeIn(delay: 400.ms),
+                            'Beach', 'Culture', 'Food & Wine', 'Photography',
+                            'Hiking', 'Art'
+                          ].map((i) => GlassChip(label: i)).toList(),
+                        ).animate().fadeIn(delay: 500.ms),
 
                         const SizedBox(height: 24),
 
-                        // Preferred destinations
+                        // Destinations
                         Text('PREFERRED DESTINATIONS', style: AppTextStyles.label),
                         const SizedBox(height: 8),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: [
-                            'Bali',
-                            'Maldives',
-                            'Santorini',
-                            'Tokyo',
-                            'Paris',
-                          ]
-                              .map((d) => _ChipTag(
-                                  label: d, icon: Icons.flight_takeoff_rounded))
+                          children: ['Bali', 'Maldives', 'Santorini', 'Tokyo']
+                              .map((d) => GlassChip(label: d, icon: Icons.place_outlined))
                               .toList(),
-                        ).animate().fadeIn(delay: 450.ms),
+                        ).animate().fadeIn(delay: 600.ms),
 
                         const SizedBox(height: 24),
 
                         // Reviews
                         Text('REVIEWS', style: AppTextStyles.label),
                         const SizedBox(height: 12),
-                        _ReviewCard(
-                          name: 'Marco',
-                          rating: 5.0,
-                          date: 'Bali, March 2026',
-                          text: 'Amazing travel companion. Very respectful and fun. '
-                              'We had a wonderful time exploring the temples.',
-                        ).animate().fadeIn(delay: 500.ms),
-                        const SizedBox(height: 12),
-                        _ReviewCard(
-                          name: 'James',
-                          rating: 4.5,
-                          date: 'Paris, January 2026',
-                          text: 'Great company, wonderful person. Highly recommend.',
-                        ).animate().fadeIn(delay: 550.ms),
+                        ...[
+                          _ReviewData('Michael', 5.0, 'Amazing companion! Sofia made our Bali trip unforgettable.', '2 months ago'),
+                          _ReviewData('James', 4.8, 'Great communication and very respectful. Highly recommend.', '4 months ago'),
+                        ].map((r) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _ReviewCard(data: r),
+                            )),
 
-                        // Bottom padding for floating button
                         const SizedBox(height: 100),
                       ],
                     ),
@@ -207,66 +254,62 @@ class ProfileDetailScreen extends StatelessWidget {
 
             // Floating action bar
             Positioned(
-              left: 20,
-              right: 20,
-              bottom: 20,
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryDark.withValues(alpha: 0.95),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: AppColors.primaryLight,
-                    width: 1,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(
+                        20, 12, 20, MediaQuery.of(context).padding.bottom + 12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.white.withValues(alpha: 0.08),
+                          Colors.white.withValues(alpha: 0.04),
+                        ],
+                      ),
+                      border: Border(
+                        top: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.1)),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        GlassContainer(
+                          borderRadius: 14,
+                          padding: const EdgeInsets.all(12),
+                          opacity: 0.1,
+                          onTap: () => context.push('/video-call/$profileId'),
+                          child: const Icon(Icons.videocam_rounded,
+                              color: AppColors.accent, size: 22),
+                        ),
+                        const SizedBox(width: 8),
+                        GlassContainer(
+                          borderRadius: 14,
+                          padding: const EdgeInsets.all(12),
+                          opacity: 0.1,
+                          child: const Icon(Icons.chat_bubble_rounded,
+                              color: AppColors.accent, size: 22),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: GlassButton(
+                            label: 'Propose Trip',
+                            icon: Icons.flight_takeoff_rounded,
+                            onPressed: () =>
+                                context.push('/propose-trip/$profileId'),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, -4),
-                    ),
-                  ],
                 ),
-                child: Row(
-                  children: [
-                    // Video call button
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.videocam_rounded,
-                            color: AppColors.accent),
-                        onPressed: () => context.push('/video-call/$profileId'),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    // Message button
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryLight,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.chat_bubble_rounded,
-                            color: AppColors.accent),
-                        onPressed: () {},
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Propose trip button
-                    Expanded(
-                      child: TwButton(
-                        label: 'Propose Trip',
-                        icon: Icons.flight_takeoff_rounded,
-                        onPressed: () => context.push('/propose-trip/$profileId'),
-                      ),
-                    ),
-                  ],
-                ),
-              ).animate().slideY(begin: 1, duration: 500.ms, delay: 300.ms, curve: Curves.easeOut),
-            ),
+              ),
+            ).animate().slideY(begin: 1, duration: 500.ms, delay: 300.ms, curve: Curves.easeOut),
           ],
         ),
       ),
@@ -274,257 +317,77 @@ class ProfileDetailScreen extends StatelessWidget {
   }
 }
 
-class _CircleBackButton extends StatelessWidget {
-  final VoidCallback onTap;
-  const _CircleBackButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.primaryDark.withValues(alpha: 0.6),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(Icons.arrow_back_ios_new, size: 18),
-        ),
-      ),
-    );
-  }
-}
-
-class _CircleIconButton extends StatelessWidget {
+class _StatPill extends StatelessWidget {
   final IconData icon;
-  final VoidCallback onTap;
-  const _CircleIconButton({required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: AppColors.primaryDark.withValues(alpha: 0.6),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(icon, size: 18, color: AppColors.white),
-      ),
-    );
-  }
-}
-
-class _PhotoGallery extends StatefulWidget {
-  final String profileId;
-  const _PhotoGallery({required this.profileId});
-
-  @override
-  State<_PhotoGallery> createState() => _PhotoGalleryState();
-}
-
-class _PhotoGalleryState extends State<_PhotoGallery> {
-  int _currentPhoto = 0;
-  final int _totalPhotos = 4;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapUp: (details) {
-        final width = MediaQuery.of(context).size.width;
-        if (details.globalPosition.dx > width / 2) {
-          if (_currentPhoto < _totalPhotos - 1) {
-            setState(() => _currentPhoto++);
-          }
-        } else {
-          if (_currentPhoto > 0) {
-            setState(() => _currentPhoto--);
-          }
-        }
-      },
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Photo placeholder
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.accent.withValues(alpha: 0.08),
-                  AppColors.rose.withValues(alpha: 0.06),
-                  AppColors.primaryLight,
-                ],
-              ),
-            ),
-            child: Icon(
-              Icons.person_rounded,
-              size: 120,
-              color: AppColors.mediumGrey.withValues(alpha: 0.2),
-            ),
-          ),
-          // Photo indicators at top
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 44,
-            left: 12,
-            right: 12,
-            child: Row(
-              children: List.generate(
-                _totalPhotos,
-                (i) => Expanded(
-                  child: Container(
-                    height: 3,
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    decoration: BoxDecoration(
-                      color: i == _currentPhoto
-                          ? AppColors.white
-                          : AppColors.white.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // Gradient overlay at bottom
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: 100,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    AppColors.primaryDark.withValues(alpha: 0.8),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatColumn extends StatelessWidget {
   final String value;
   final String label;
-  final IconData icon;
-  const _StatColumn({required this.value, required this.label, required this.icon});
+
+  const _StatPill({required this.icon, required this.value, required this.label});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: AppColors.accent, size: 20),
-        const SizedBox(height: 4),
-        Text(value,
-            style: AppTextStyles.heading3.copyWith(color: AppColors.accent)),
-        Text(label, style: AppTextStyles.caption),
-      ],
+    return Expanded(
+      child: GlassCard(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Column(
+          children: [
+            Icon(icon, size: 18, color: AppColors.accent),
+            const SizedBox(height: 6),
+            Text(value, style: AppTextStyles.heading3.copyWith(fontSize: 18)),
+            Text(label, style: AppTextStyles.caption),
+          ],
+        ),
+      ),
     );
   }
 }
 
-class _ChipTag extends StatelessWidget {
-  final String label;
-  final IconData? icon;
-  const _ChipTag({required this.label, this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: AppColors.primaryLight,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 14, color: AppColors.accentLight),
-            const SizedBox(width: 4),
-          ],
-          Text(label,
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.lightGrey)),
-        ],
-      ),
-    );
-  }
+class _ReviewData {
+  final String name;
+  final double rating;
+  final String text;
+  final String time;
+  const _ReviewData(this.name, this.rating, this.text, this.time);
 }
 
 class _ReviewCard extends StatelessWidget {
-  final String name;
-  final double rating;
-  final String date;
-  final String text;
-  const _ReviewCard(
-      {required this.name,
-      required this.rating,
-      required this.date,
-      required this.text});
+  final _ReviewData data;
+  const _ReviewCard({required this.data});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.primaryLight,
-        borderRadius: BorderRadius.circular(16),
-      ),
+    return GlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: Text(name[0],
-                      style: AppTextStyles.bodyMedium
-                          .copyWith(color: AppColors.accent, fontWeight: FontWeight.w600)),
-                ),
-              ),
-              const SizedBox(width: 10),
+              GlassAvatar(size: 36),
+              const SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(name,
-                      style: AppTextStyles.bodyMedium
-                          .copyWith(fontWeight: FontWeight.w600)),
-                  Text(date, style: AppTextStyles.caption),
+                  Text(data.name, style: AppTextStyles.bodyMedium
+                      .copyWith(fontWeight: FontWeight.w600)),
+                  Text(data.time, style: AppTextStyles.caption),
                 ],
               ),
               const Spacer(),
               Row(
                 children: [
-                  const Icon(Icons.star_rounded, color: AppColors.accent, size: 16),
-                  const SizedBox(width: 2),
-                  Text(rating.toString(),
+                  const Icon(Icons.star_rounded,
+                      size: 14, color: AppColors.accent),
+                  const SizedBox(width: 4),
+                  Text('${data.rating}',
                       style: AppTextStyles.bodySmall
-                          .copyWith(color: AppColors.accent, fontWeight: FontWeight.w600)),
+                          .copyWith(color: AppColors.accent)),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(text,
-              style: AppTextStyles.bodySmall
-                  .copyWith(color: AppColors.lightGrey, height: 1.5)),
+          const SizedBox(height: 12),
+          Text(data.text, style: AppTextStyles.bodySmall
+              .copyWith(color: Colors.white.withValues(alpha: 0.7))),
         ],
       ),
     );

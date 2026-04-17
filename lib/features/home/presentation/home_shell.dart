@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/glass_widgets.dart';
 
 class HomeShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -10,117 +10,43 @@ class HomeShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: navigationShell,
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.primaryDark,
-          border: Border(
-            top: BorderSide(color: AppColors.primaryLight, width: 0.5),
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _NavItem(
-                  icon: Icons.explore_rounded,
-                  label: 'Discover',
-                  isSelected: navigationShell.currentIndex == 0,
-                  onTap: () => navigationShell.goBranch(0),
-                ),
-                _NavItem(
-                  icon: Icons.flight_rounded,
-                  label: 'Trips',
-                  isSelected: navigationShell.currentIndex == 1,
-                  onTap: () => navigationShell.goBranch(1),
-                ),
-                _NavItem(
-                  icon: Icons.chat_bubble_rounded,
-                  label: 'Messages',
-                  isSelected: navigationShell.currentIndex == 2,
-                  badge: 2, // TODO: dynamic unread count
-                  onTap: () => navigationShell.goBranch(2),
-                ),
-                _NavItem(
-                  icon: Icons.person_rounded,
-                  label: 'Profile',
-                  isSelected: navigationShell.currentIndex == 3,
-                  onTap: () => navigationShell.goBranch(3),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isSelected;
-  final int badge;
-  final VoidCallback onTap;
-
-  const _NavItem({
-    required this.icon,
-    required this.label,
-    required this.isSelected,
-    this.badge = 0,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: SizedBox(
-        width: 64,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+      body: GlassBackground.standard(
+        child: Stack(
           children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Icon(
-                  icon,
-                  color: isSelected ? AppColors.accent : AppColors.mediumGrey,
-                  size: 26,
+            navigationShell,
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: GlassNavBar(
+                currentIndex: navigationShell.currentIndex,
+                onTap: (i) => navigationShell.goBranch(
+                  i,
+                  initialLocation: i == navigationShell.currentIndex,
                 ),
-                if (badge > 0)
-                  Positioned(
-                    right: -8,
-                    top: -4,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 5, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: AppColors.error,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        '$badge',
-                        style: const TextStyle(
-                          color: AppColors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
+                items: const [
+                  GlassNavItem(
+                    icon: Icons.explore_outlined,
+                    activeIcon: Icons.explore_rounded,
+                    label: 'Discover',
                   ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? AppColors.accent : AppColors.mediumGrey,
-                fontSize: 11,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  GlassNavItem(
+                    icon: Icons.flight_outlined,
+                    activeIcon: Icons.flight_rounded,
+                    label: 'Trips',
+                  ),
+                  GlassNavItem(
+                    icon: Icons.chat_bubble_outline_rounded,
+                    activeIcon: Icons.chat_bubble_rounded,
+                    label: 'Messages',
+                    badge: 2,
+                  ),
+                  GlassNavItem(
+                    icon: Icons.person_outline_rounded,
+                    activeIcon: Icons.person_rounded,
+                    label: 'Profile',
+                  ),
+                ],
               ),
             ),
           ],

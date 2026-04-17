@@ -1,0 +1,148 @@
+              <button onClick={() => {setIsSubscribed(true); setScreen('hub'); toast("BIENVENIDO AL CLUB PLATINUM", 'gold');}} className="btn-gold w-full flex items-center justify-center gap-3 py-5 text-sm font-black shadow-primary/30 uppercase tracking-[2px]">Activar Cuenta Elite</button>
+            </div>
+          </div>
+        );
+
+      case 'hub':
+        return (
+          <div className="h-full flex flex-col">
+            <header className="px-6 pt-4 flex justify-between items-center mb-2">
+              <div><h1 className="text-2xl font-black tracking-tight leading-none italic">Vívelo</h1><p className="text-[8px] text-primary font-bold tracking-[3px] uppercase mt-1 opacity-80">{role === 'male' ? 'PLATINUM FEED' : 'DASHBOARD'}</p></div>
+              <div className="flex gap-2">
+                 <button className="w-10 h-10 glass rounded-full flex justify-center items-center group active:scale-95 transition-all"><Bell size={16} className="text-zinc-500 group-hover:text-primary transition-colors" /></button>
+                 <button onClick={() => setScreen('profile')} className="w-10 h-10 rounded-full border-2 border-primary overflow-hidden p-[1px] shadow-lg active:scale-95 transition-all"><img src={role === 'male' ? "/assets/sebastian.png" : "/assets/isabella.png"} className="w-full h-full rounded-full object-cover" /></button>
+              </div>
+            </header>
+
+            <div className="px-6 mb-4">
+              <div className="flex justify-between items-center mb-2"><p className="text-[8px] text-zinc-500 font-black uppercase tracking-widest flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]" /> Live Now</p></div>
+              <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+                {TRAVELERS.map((p, idx) => (
+                  <div key={idx} className="flex-shrink-0 text-center" onClick={() => {setActiveUser(p); setIsCalling(true);}}>
+                    <div className="relative group">
+                       <div className="w-[60px] h-[60px] rounded-full p-[2px] border-2 border-primary/40 mb-1 bg-black overflow-hidden relative z-10 group-hover:border-primary transition-all">
+                        <img src={p.img} className="w-full h-full rounded-full object-cover grayscale-[0.2] transition-transform group-hover:scale-110" />
+                      </div>
+                      <span className="absolute bottom-0.5 right-0.5 bg-red-500 text-[6px] font-black px-1.5 py-0.5 rounded-full border border-black z-20 shadow-xl">LIVE</span>
+                    </div>
+                    <span className="text-[9px] font-bold text-zinc-500 mt-1 block tracking-tight">{p.name.split(' ')[0]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1 px-6 overflow-y-auto pb-44 space-y-8">
+              {TRAVELERS.map(traveler => (
+                <div key={traveler.id} className="glass-card p-0 overflow-hidden relative shadow-2xl border-white/5 active:scale-[0.98] transition-all" onClick={() => { setActiveUser(traveler); setIsPreviewing(true); }}>
+                    <img src={traveler.img} className="w-full h-[400px] object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
+                    <div className="absolute bottom-8 left-8 right-8">
+                      <div className="flex gap-2 mb-4">
+                        <span className="bg-primary/20 text-primary-light text-[9px] font-black px-3 py-1.5 rounded-lg border border-primary/20 uppercase">{traveler.tag}</span>
+                        <span className="bg-white/10 text-white text-[9px] font-black px-3 py-1.5 rounded-lg border border-white/10 uppercase tracking-widest">{traveler.location}</span>
+                      </div>
+                      <h3 className="text-3xl font-black text-white italic tracking-tighter">{traveler.name}, {traveler.age}</h3>
+                    </div>
+                </div>
+              ))}
+            </div>
+            <Navbar active="hub" role={role} onNav={(s) => setScreen(s)} />
+
+            {/* PROFILE PREVIEW MODAL */}
+            <AnimatePresence>
+               {isPreviewing && activeUser && (
+                  <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25 }} className="absolute inset-0 z-[150] bg-[#050505]">
+                     <div className="h-[42%] relative">
+                        <img src={activeUser.img} className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-black/20" />
+                        <button onClick={() => setIsPreviewing(false)} className="absolute top-12 left-6 w-10 h-10 glass rounded-full flex items-center justify-center text-white"><ChevronLeft size={20} /></button>
+                        <button onClick={() => toast("ENLACE DE PERFIL COPIADO", "gold")} className="absolute top-12 right-6 w-10 h-10 glass rounded-full flex items-center justify-center text-white"><Share2 size={18} /></button>
+                        
+                        <div className="absolute bottom-6 left-8 right-8">
+                           <div className="flex gap-2 mb-3">
+                              <span className="bg-primary/20 text-primary text-[8px] font-black px-2.5 py-1 rounded-full border border-primary/20 uppercase tracking-widest">{activeUser.tag}</span>
+                              <div className="flex -space-x-1.5 ml-auto">
+                                 {[1,2,3].map(i => <div key={i} className="w-5 h-5 rounded-full border border-black bg-zinc-800 overflow-hidden"><img src={`/assets/traveler_${i}.png`} className="w-full h-full object-cover" /></div>)}
+                                 <div className="w-5 h-5 rounded-full border border-black bg-primary/20 flex items-center justify-center text-[6px] font-black text-primary">+8</div>
+                              </div>
+                           </div>
+                           <h2 className="text-4xl font-black text-white italic tracking-tighter">{activeUser.name}, {activeUser.age}</h2>
+                           <p className="text-zinc-400 text-xs flex items-center gap-1.5 mt-1 font-medium"><MapPin size={12} className="text-primary" /> {activeUser.location}</p>
+                        </div>
+                     </div>
+                     
+                     <div className="px-8 pt-6 space-y-6 overflow-y-auto h-[58%] pb-32 scrollbar-hide">
+                        {/* TRUST STATS */}
+                        <div className="grid grid-cols-3 p-5 bg-white/5 border border-white/5 rounded-[32px] backdrop-blur-md">
+                           <div className="text-center group" onClick={() => toast("REPUTACIÓN EXCELENTE", 'gold')}>
+                              <p className="text-[7px] text-zinc-500 font-black uppercase mb-1 tracking-widest group-hover:text-primary transition-colors">Elite Score</p>
+                              <p className="text-xs font-black text-white italic">9.8/10</p>
+                           </div>
+                           <div className="border-x border-white/5 flex flex-col justify-center items-center group cursor-pointer" onClick={() => setShowVouchModal(true)}>
+                              <p className="text-[7px] text-zinc-500 font-black uppercase mb-1 tracking-widest group-hover:text-primary transition-colors">Avales</p>
+                              <p className="text-xs font-black text-primary italic">12 Premiums</p>
+                           </div>
+                           <div className="text-center group">
+                              <p className="text-[7px] text-zinc-500 font-black uppercase mb-1 tracking-widest group-hover:text-primary transition-colors">Respuesta</p>
+                              <p className="text-xs font-black text-white italic">&lt; 15 min</p>
+                           </div>
+                        </div>
+
+                        {/* BIO */}
+                        <div>
+                           <h4 className="text-[8px] font-black text-primary/60 uppercase tracking-[3px] mb-2">Filosofía de Viaje</h4>
+                           <p className="text-zinc-400 text-[13px] leading-relaxed italic opacity-90">{activeUser.bio}</p>
+                        </div>
+
+                        {/* ATTRIBUTES */}
+                        <div className="flex flex-wrap gap-2">
+                           {['Gourmet', 'Yacht Lover', 'Private Art', 'KYC Verified'].map(attr => (
+                              <span key={attr} className="px-4 py-2 bg-zinc-900 border border-white/5 rounded-2xl text-[8px] font-black text-zinc-500 uppercase tracking-widest hover:border-primary/40 hover:text-white transition-all cursor-default">{attr}</span>
+                           ))}
+                        </div>
+
+                        {/* PRIVATE MOMENTS */}
+                        <div>
+                            <div className="flex justify-between items-center mb-4">
+                               <h4 className="text-[8px] font-black text-primary/60 uppercase tracking-[3px]">Momentos Privados</h4>
+                               <p className="text-[8px] text-zinc-600 font-black uppercase tracking-widest">Solo Platinum</p>
+                            </div>
+                            <div className="flex gap-4">
+                               {[1,2,3].map(i => (
+                                  <div key={i} className="flex-1 aspect-square rounded-2xl bg-zinc-900 border border-white/5 flex items-center justify-center overflow-hidden grayscale relative group cursor-pointer" onClick={() => toast("SOLO MIEMBROS PLATINUM", "gold")}>
+                                     <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-10 opacity-100 group-hover:opacity-0 transition-opacity" />
+                                     <Lock size={16} className="text-zinc-700 z-20 relative transition-transform group-hover:scale-125" />
+                                  </div>
+                               ))}
+                            </div>
+                        </div>
+
+                        {/* UNIFIED ACTION HUB */}
+                        <div className="flex gap-3 pt-4">
+                           <button onClick={() => { setIsPreviewing(false); setIsCalling(true); }} className="h-16 w-16 glass rounded-[24px] flex items-center justify-center text-primary border-primary/20 shadow-xl active:scale-95 transition-all hover:bg-primary/5">
+                              <Video size={24} />
+                           </button>
+                           <button onClick={() => handleOpenChat(activeUser)} className="h-16 flex-1 btn-gold rounded-[24px] flex items-center justify-center gap-3 text-xs font-black tracking-[4px] uppercase shadow-[0_10px_30px_rgba(197,168,128,0.3)] active:scale-95 transition-all">
+                              <MessageSquare size={18} />
+                              Iniciar Chat
+                           </button>
+                        </div>
+                     </div>
+
+                     <AnimatePresence>
+                        {showVouchModal && (
+                           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="absolute inset-0 z-[200] flex items-center justify-center px-10 bg-black/80 backdrop-blur-xl" onClick={() => setShowVouchModal(false)}>
+                              <div className="glass p-8 rounded-[40px] border-primary/30 shadow-2xl text-center max-w-sm">
+                                 <div className="w-16 h-16 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-primary/20"><Gem size={32} className="text-primary" /></div>
+                                 <h4 className="text-primary font-black text-xs mb-3 uppercase tracking-[4px]">Reputación Elite</h4>
+                                 <p className="text-white font-black text-xl italic tracking-tighter mb-4">Avalada por 12 Miembros Platinum</p>
+                                 <p className="text-[11px] text-zinc-500 font-bold uppercase tracking-widest leading-relaxed">Este perfil ha sido verificado manualmente por miembros de confianza en la red privada.</p>
+                              </div>
+                           </motion.div>
+                        )}
+                     </AnimatePresence>
+                  </motion.div>
+               )}
+            </AnimatePresence>
+          </div>
+        );

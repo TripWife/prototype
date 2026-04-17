@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_text_styles.dart';
-import '../../../core/widgets/tw_button.dart';
-import '../../../core/widgets/tw_text_field.dart';
+import '../../../core/widgets/glass_widgets.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -13,58 +12,25 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  final _firstNameCtrl = TextEditingController(text: 'John');
-  final _lastNameCtrl = TextEditingController(text: 'Doe');
-  final _bioCtrl = TextEditingController(
-      text: 'Entrepreneur and frequent traveler. Love discovering new places and cultures.');
-  final _cityCtrl = TextEditingController(text: 'New York');
-  final _occupationCtrl = TextEditingController(text: 'CEO');
   bool _isLoading = false;
-
-  final _selectedInterests = <String>{'Beach', 'Culture', 'Food & Wine', 'Business'};
-  final _allInterests = [
-    'Beach', 'Culture', 'Food & Wine', 'Photography', 'Hiking',
-    'Art', 'Nightlife', 'Adventure', 'Wellness', 'Business',
-    'Shopping', 'History', 'Nature', 'Music', 'Sports',
-  ];
-
-  final _selectedDestinations = <String>{'Bali', 'Maldives', 'Dubai'};
-  final _allDestinations = [
-    'Bali', 'Maldives', 'Dubai', 'Santorini', 'Tokyo',
-    'Paris', 'New York', 'London', 'Cancun', 'Mykonos',
-    'Amalfi Coast', 'Phuket', 'Seychelles', 'Marbella', 'Ibiza',
-  ];
-
-  final _selectedLanguages = <String>{'English', 'Spanish'};
-  final _allLanguages = [
-    'English', 'Spanish', 'French', 'Italian', 'Portuguese',
-    'German', 'Arabic', 'Japanese', 'Chinese', 'Russian',
-  ];
-
-  @override
-  void dispose() {
-    _firstNameCtrl.dispose();
-    _lastNameCtrl.dispose();
-    _bioCtrl.dispose();
-    _cityCtrl.dispose();
-    _occupationCtrl.dispose();
-    super.dispose();
-  }
+  final _selectedInterests = {'Beach', 'Culture', 'Food & Wine'};
+  final _selectedDestinations = {'Bali', 'Santorini', 'Tokyo'};
+  final _selectedLanguages = {'English', 'Spanish'};
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+      body: GlassBackground.standard(
         child: SafeArea(
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios),
+                      icon: Icon(Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white.withValues(alpha: 0.8), size: 20),
                       onPressed: () => context.pop(),
                     ),
                     const Spacer(),
@@ -76,105 +42,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Photos section
+                      // Photos
                       Text('PHOTOS', style: AppTextStyles.label),
                       const SizedBox(height: 12),
                       SizedBox(
-                        height: 120,
+                        height: 110,
                         child: ListView(
                           scrollDirection: Axis.horizontal,
                           children: [
-                            ...List.generate(
-                              3,
-                              (i) => Container(
-                                width: 90,
-                                height: 120,
-                                margin: const EdgeInsets.only(right: 10),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryLight,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Stack(
-                                  children: [
-                                    Center(
-                                      child: Icon(Icons.person,
-                                          color: AppColors.mediumGrey.withValues(alpha: 0.3),
-                                          size: 36),
-                                    ),
-                                    if (i == 0)
-                                      Positioned(
-                                        bottom: 4,
-                                        left: 0,
-                                        right: 0,
-                                        child: Center(
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: AppColors.accent,
-                                              borderRadius:
-                                                  BorderRadius.circular(6),
-                                            ),
-                                            child: Text('Main',
-                                                style: AppTextStyles.caption
-                                                    .copyWith(
-                                                  color: AppColors.primary,
-                                                  fontSize: 9,
-                                                  fontWeight: FontWeight.w700,
-                                                )),
-                                          ),
-                                        ),
-                                      ),
-                                    Positioned(
-                                      top: 4,
-                                      right: 4,
-                                      child: Container(
-                                        padding: const EdgeInsets.all(2),
-                                        decoration: const BoxDecoration(
-                                          color: AppColors.error,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(Icons.close,
-                                            size: 12, color: AppColors.white),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            // Add photo button
-                            GestureDetector(
-                              onTap: () {},
-                              child: Container(
-                                width: 90,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryLight,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: AppColors.accent.withValues(alpha: 0.3),
-                                    style: BorderStyle.solid,
-                                  ),
-                                ),
-                                child: const Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.add_photo_alternate_rounded,
-                                        color: AppColors.accent, size: 28),
-                                    SizedBox(height: 4),
-                                    Text('Add',
-                                        style: TextStyle(
-                                          color: AppColors.accent,
-                                          fontSize: 11,
-                                        )),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            ...List.generate(3, (i) => _PhotoSlot(
+                              isMain: i == 0,
+                              onRemove: () {},
+                            )),
+                            _AddPhotoSlot(),
                           ],
                         ),
                       ),
@@ -184,26 +68,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: TwTextField(
-                                label: 'FIRST NAME',
-                                controller: _firstNameCtrl),
+                            child: GlassTextField(
+                              label: 'First Name',
+                              hint: 'John',
+                              controller: TextEditingController(text: 'John'),
+                            ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: TwTextField(
-                                label: 'LAST NAME',
-                                controller: _lastNameCtrl),
+                            child: GlassTextField(
+                              label: 'Last Name',
+                              hint: 'Doe',
+                              controller: TextEditingController(text: 'Doe'),
+                            ),
                           ),
                         ],
                       ),
 
                       const SizedBox(height: 20),
 
-                      TwTextField(
-                        label: 'BIO',
-                        controller: _bioCtrl,
+                      GlassTextField(
+                        label: 'Bio',
+                        hint: 'Tell others about yourself...',
                         maxLines: 3,
-                        hint: 'Tell people about yourself...',
+                        controller: TextEditingController(
+                          text: 'Entrepreneur and frequent traveler. Love discovering new places and cultures.',
+                        ),
                       ),
 
                       const SizedBox(height: 20),
@@ -211,77 +101,81 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Row(
                         children: [
                           Expanded(
-                            child: TwTextField(
-                              label: 'CITY',
-                              controller: _cityCtrl,
+                            child: GlassTextField(
+                              label: 'City',
+                              hint: 'Your city',
                               prefixIcon: Icons.location_on_outlined,
+                              controller: TextEditingController(text: 'New York'),
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: TwTextField(
-                              label: 'OCCUPATION',
-                              controller: _occupationCtrl,
-                              prefixIcon: Icons.work_outline,
+                            child: GlassTextField(
+                              label: 'Occupation',
+                              hint: 'Your job',
+                              prefixIcon: Icons.work_outline_rounded,
+                              controller: TextEditingController(text: 'CEO'),
                             ),
                           ),
                         ],
                       ),
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 28),
 
+                      // Interests
                       _ChipSelector(
                         label: 'INTERESTS',
-                        items: _allInterests,
+                        options: const [
+                          'Beach', 'Culture', 'Food & Wine', 'Photography',
+                          'Hiking', 'Art', 'Nightlife', 'Adventure',
+                          'Wellness', 'Shopping', 'History', 'Nature',
+                          'Music', 'Business',
+                        ],
                         selected: _selectedInterests,
-                        onToggle: (item) {
-                          setState(() {
-                            if (_selectedInterests.contains(item)) {
-                              _selectedInterests.remove(item);
-                            } else {
-                              _selectedInterests.add(item);
-                            }
-                          });
-                        },
+                        onToggle: (v) => setState(() {
+                          _selectedInterests.contains(v)
+                              ? _selectedInterests.remove(v)
+                              : _selectedInterests.add(v);
+                        }),
                       ),
 
                       const SizedBox(height: 24),
 
                       _ChipSelector(
                         label: 'PREFERRED DESTINATIONS',
-                        items: _allDestinations,
+                        options: const [
+                          'Bali', 'Maldives', 'Santorini', 'Tokyo',
+                          'Paris', 'Dubai', 'New York', 'Barcelona',
+                          'Amalfi Coast', 'Swiss Alps', 'Tulum', 'Mykonos',
+                        ],
                         selected: _selectedDestinations,
-                        onToggle: (item) {
-                          setState(() {
-                            if (_selectedDestinations.contains(item)) {
-                              _selectedDestinations.remove(item);
-                            } else {
-                              _selectedDestinations.add(item);
-                            }
-                          });
-                        },
+                        onToggle: (v) => setState(() {
+                          _selectedDestinations.contains(v)
+                              ? _selectedDestinations.remove(v)
+                              : _selectedDestinations.add(v);
+                        }),
                       ),
 
                       const SizedBox(height: 24),
 
                       _ChipSelector(
                         label: 'LANGUAGES',
-                        items: _allLanguages,
+                        options: const [
+                          'English', 'Spanish', 'French', 'German',
+                          'Italian', 'Portuguese', 'Japanese', 'Chinese',
+                          'Arabic', 'Russian',
+                        ],
                         selected: _selectedLanguages,
-                        onToggle: (item) {
-                          setState(() {
-                            if (_selectedLanguages.contains(item)) {
-                              _selectedLanguages.remove(item);
-                            } else {
-                              _selectedLanguages.add(item);
-                            }
-                          });
-                        },
+                        onToggle: (v) => setState(() {
+                          _selectedLanguages.contains(v)
+                              ? _selectedLanguages.remove(v)
+                              : _selectedLanguages.add(v);
+                        }),
                       ),
 
                       const SizedBox(height: 32),
 
-                      TwButton(
+                      GlassButton(
                         label: 'Save Changes',
                         width: double.infinity,
                         isLoading: _isLoading,
@@ -294,7 +188,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         },
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 32),
                     ],
                   ),
                 ),
@@ -307,15 +201,85 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 }
 
+class _PhotoSlot extends StatelessWidget {
+  final bool isMain;
+  final VoidCallback onRemove;
+  const _PhotoSlot({required this.isMain, required this.onRemove});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          GlassContainer(
+            borderRadius: 16,
+            width: 85,
+            height: 110,
+            opacity: 0.08,
+            padding: EdgeInsets.zero,
+            child: Center(
+              child: Icon(Icons.person_rounded,
+                  size: 32, color: Colors.white.withValues(alpha: 0.2)),
+            ),
+          ),
+          if (isMain)
+            Positioned(
+              bottom: 6,
+              left: 6,
+              child: GlassBadge(text: 'Main', color: AppColors.accent),
+            ),
+          Positioned(
+            top: -6,
+            right: -6,
+            child: GestureDetector(
+              onTap: onRemove,
+              child: Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  color: AppColors.error.withValues(alpha: 0.8),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close_rounded,
+                    size: 14, color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddPhotoSlot extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GlassContainer(
+      borderRadius: 16,
+      width: 85,
+      height: 110,
+      opacity: 0.05,
+      borderOpacity: 0.2,
+      padding: EdgeInsets.zero,
+      child: Center(
+        child: Icon(Icons.add_rounded,
+            size: 28, color: Colors.white.withValues(alpha: 0.3)),
+      ),
+    );
+  }
+}
+
 class _ChipSelector extends StatelessWidget {
   final String label;
-  final List<String> items;
+  final List<String> options;
   final Set<String> selected;
-  final void Function(String) onToggle;
+  final ValueChanged<String> onToggle;
 
   const _ChipSelector({
     required this.label,
-    required this.items,
+    required this.options,
     required this.selected,
     required this.onToggle,
   });
@@ -326,39 +290,17 @@ class _ChipSelector extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: AppTextStyles.label),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: items.map((item) {
-            final isSelected = selected.contains(item);
-            return GestureDetector(
-              onTap: () => onToggle(item),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.accent.withValues(alpha: 0.15)
-                      : AppColors.primaryLight,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color:
-                        isSelected ? AppColors.accent : Colors.transparent,
-                    width: 1.5,
-                  ),
-                ),
-                child: Text(
-                  item,
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: isSelected ? AppColors.accent : AppColors.lightGrey,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.w400,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+          children: options
+              .map((opt) => GlassChip(
+                    label: opt,
+                    isSelected: selected.contains(opt),
+                    onTap: () => onToggle(opt),
+                  ))
+              .toList(),
         ),
       ],
     );
