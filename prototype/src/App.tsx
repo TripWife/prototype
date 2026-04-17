@@ -62,7 +62,7 @@ const GENTLEMEN: UserData[] = [
 // --- Components ---
 
 const FullscreenContainer = ({ children }: { children: React.ReactNode }) => (
-  <div className="fixed inset-0 bg-black flex flex-col overflow-hidden select-none touch-none">
+  <div className="fixed inset-0 w-screen h-screen bg-black flex flex-col overflow-hidden select-none touch-none z-[9999]">
     {children}
   </div>
 );
@@ -143,7 +143,10 @@ export default function App() {
     switch(screen) {
       case 'splash':
         return (
-          <div className="h-full flex flex-col items-center justify-center bg-black px-12 text-center fade-in">
+          <div className="w-screen h-screen flex flex-col items-center justify-center bg-black px-6 text-center fade-in">
+            <div className="absolute top-8 left-0 right-0 flex justify-center opacity-30">
+               <span className="text-[7px] font-black text-primary uppercase tracking-[5px]">NATIVA LIVE 1.2</span>
+            </div>
             <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mb-12">
                <div className="w-24 h-24 bg-primary rounded-[32px] flex items-center justify-center shadow-[0_0_60px_rgba(197,168,128,0.4)] mx-auto"><Gem size={48} className="text-black" /></div>
             </motion.div>
@@ -152,10 +155,10 @@ export default function App() {
             
             <div className="w-full space-y-4 pt-12">
                <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest mb-6">Selecciona tu perfil de acceso</p>
-               <button onClick={() => { setRole('male'); setScreen('onboarding'); }} className="w-full py-5 rounded-[24px] bg-white text-black text-[10px] font-black uppercase tracking-[4px] shadow-xl active:scale-95 transition-all">
+               <button onClick={() => { setRole('male'); setScreen('onboarding'); }} className="w-full py-5 rounded-[24px] bg-white text-black text-[10px] font-black uppercase tracking-[4px] shadow-xl active:scale-95 transition-all focus:outline-none">
                   Soy un Caballero
                </button>
-               <button onClick={() => { setRole('female'); setScreen('onboarding'); }} className="w-full py-5 rounded-[24px] glass border-white/20 text-white text-[10px] font-black uppercase tracking-[4px] active:scale-95 transition-all">
+               <button onClick={() => { setRole('female'); setScreen('onboarding'); }} className="w-full py-5 rounded-[24px] glass border-white/20 text-white text-[10px] font-black uppercase tracking-[4px] active:scale-95 transition-all focus:outline-none">
                   Soy una Viajera
                </button>
             </div>
